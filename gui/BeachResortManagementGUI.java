@@ -1,18 +1,18 @@
 package gui;
 
 import dao.*;
-import models.*;
-
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.SQLException;
+import java.time.*;
+import java.time.format.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.time.*;
-import java.time.format.*;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.ArrayList;
+import models.*;
 
 public class BeachResortManagementGUI extends JFrame {
 
@@ -2162,21 +2162,24 @@ public class BeachResortManagementGUI extends JFrame {
         return panel;
     }
 
-    // INVENTORY RESTOCK - Placeholder
+    // INVENTORY RESTOCKING - Full Implementation (Vener Mariano)
     private JPanel createInventoryRestockPanel() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // Header
+        RestockDAO restockDAO = new RestockDAO();  
+        InventoryDAO inventoryDAO = new InventoryDAO();
+
+        // ---------- HEADER ----------
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("Inventory Restocking");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
 
         JLabel assignLabel = new JLabel("Assigned to: Vener Mariano");
-        assignLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
         assignLabel.setForeground(new Color(127, 140, 141));
 
         JPanel titlePanel = new JPanel(new GridLayout(2, 1));
@@ -2187,13 +2190,188 @@ public class BeachResortManagementGUI extends JFrame {
         headerPanel.add(titlePanel, BorderLayout.WEST);
         panel.add(headerPanel, BorderLayout.NORTH);
 
-        JLabel infoLabel = new JLabel("<html><center>Implement inventory restock transaction<br>" +
-                "Use RestockDAO.processRestock() method</center></html>");
-        infoLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
-        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(infoLabel, BorderLayout.CENTER);
+
+        // ---------- FORM ----------
+
+        //the big one
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(Color.WHITE);
+        formPanel.setBorder(new CompoundBorder(
+                new LineBorder(new Color(189, 195, 199), 1),
+                new EmptyBorder(20, 20, 20, 20)
+        ));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // ITEM SELECTOR (ID + name)
+        gbc.gridx = 0; gbc.gridy = 0;
+        formPanel.add(new JLabel("Select Item:"), gbc);
+
+        JComboBox<ItemWrapper> itemCombo = new JComboBox<>();
+        try {
+            List<InventoryItem> items = inventoryDAO.getAllInventoryItems();
+
+            for (InventoryItem itm : items) {
+                itemCombo.addItem(new ItemWrapper(itm.getItemId(), itm.getName()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        gbc.gridx = 1;
+        formPanel.add(itemCombo, gbc);
+
+
+        // SUPPLIER
+        gbc.gridx = 0; gbc.gridy = 1;
+        formPanel.add(new JLabel("Supplier:"), gbc);
+
+        JTextField supplierField = new JTextField();
+        gbc.gridx = 1;
+        formPanel.add(supplierField, gbc);
+
+
+        // QUANTITY
+        gbc.gridx = 0; gbc.gridy = 2;
+        formPanel.add(new JLabel("Quantity:"), gbc);
+
+        JTextField qtyField = new JTextField();
+        gbc.gridx = 1;
+        formPanel.add(qtyField, gbc);
+
+
+        // NOTES
+        gbc.gridx = 0; gbc.gridy = 3;
+        formPanel.add(new JLabel("Notes:"), gbc);
+
+        JTextArea notesArea = new JTextArea(4, 20);
+        notesArea.setLineWrap(true);
+        notesArea.setWrapStyleWord(true);
+        gbc.gridx = 1;
+        formPanel.add(new JScrollPane(notesArea), gbc);
+
+        // DATE
+        gbc.gridx = 0; gbc.gridy = 4;
+        formPanel.add(new JLabel("Restock Date (YYYY-MM-DD):"), gbc);
+
+        JTextField dateField = new JTextField();
+        gbc.gridx = 1;
+        formPanel.add(dateField, gbc);
+
+        // ---------- INVENTORY TABLE ----------
+        JTable inventoryTable = new JTable();
+        JScrollPane tableScroll = new JScrollPane(inventoryTable);
+        tableScroll.setPreferredSize(new Dimension(450, 170));
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
+        formPanel.add(tableScroll, gbc);
+
+        refreshInventoryTable(inventoryTable, inventoryDAO);
+
+        // ---------- BUTTON ----------
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        actionPanel.setOpaque(false);
+
+        JButton processBtn = createActionButton("Process Restock", SUCCESS_COLOR);
+        processBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
+
+        actionPanel.add(processBtn);
+
+        panel.add(formPanel, BorderLayout.CENTER);
+        panel.add(actionPanel, BorderLayout.SOUTH);
+
+        // ---------- BUTTON ACTION ----------
+        processBtn.addActionListener(e -> {
+            ItemWrapper wrapper = (ItemWrapper) itemCombo.getSelectedItem();
+
+            if (wrapper == null) {
+                JOptionPane.showMessageDialog(panel, "No item selected!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Long itemId = wrapper.id;
+            String supplier = supplierField.getText().trim();
+            String notes = notesArea.getText().trim();
+
+            String dateStr = dateField.getText().trim();
+            java.sql.Date restockDate;
+
+            try {
+                // Parse user input to LocalDate, then convert to java.sql.Date
+                LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("YYYY-MM-DD"));
+                restockDate = java.sql.Date.valueOf(localDate);
+            } catch (DateTimeParseException ex) {
+                JOptionPane.showMessageDialog(panel, "Invalid date format! Use YYYY-MM-DD", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            int quantity;
+
+            try {
+                quantity = Integer.parseInt(qtyField.getText().trim());
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(panel, "Quantity must be a number!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                Long restockId = restockDAO.processRestock(itemId, supplier, quantity, notes, restockDate);
+
+                JOptionPane.showMessageDialog(panel,
+                        "Restock successful! (ID: " + restockId + ")",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                refreshInventoryTable(inventoryTable, inventoryDAO);
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(panel,
+                        "Restock failed:\n" + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
 
         return panel;
+    }
+
+    // Helper class to store ID+name while showing name in JComboBox
+    private static class ItemWrapper {
+        Long id;
+        String name;
+
+        public ItemWrapper(Long id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;  // display name only
+        }
+    }
+
+    // Refresh table method
+    private void refreshInventoryTable(JTable table, InventoryDAO dao) {
+        try {
+            List<InventoryItem> items = dao.getAllInventoryItems();
+
+            items.sort(Comparator.comparingLong(InventoryItem::getItemId)); // sort items before populating table
+
+            String[] cols = {"ID", "Item Name", "Quantity"};
+            Object[][] data = new Object[items.size()][3];
+
+            for (int i = 0; i < items.size(); i++) {
+                data[i][0] = items.get(i).getItemId();
+                data[i][1] = items.get(i).getName();
+                data[i][2] = items.get(i).getQuantityOnHand();
+            }
+
+            table.setModel(new DefaultTableModel(data, cols));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // AMENITY RENTAL - Placeholder

@@ -1,17 +1,14 @@
 package dao;
 
 import database.DatabaseConnection;
-
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RestockDAO {
 
     // TRANSACTION 4: Inventory Restocking
-    public Long processRestock(Long itemId, String supplier, int quantity, String notes) throws SQLException {
+    public Long processRestock(Long itemId, String supplier, int quantity, String notes, java.sql.Date restockDate) throws SQLException {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -40,12 +37,13 @@ public class RestockDAO {
             }
 
             // STEP 3: Insert restocking record
-            String insertRestockSql = "INSERT INTO restock (item_id, supplier, quantity, notes) VALUES (?, ?, ?, ?)";
+            String insertRestockSql = "INSERT INTO restock (item_id, supplier, quantity, notes, restock_date) VALUES (?, ?, ?, ?, ?)";
             pstmt = conn.prepareStatement(insertRestockSql, Statement.RETURN_GENERATED_KEYS);
             pstmt.setLong(1, itemId);
             pstmt.setString(2, supplier);
             pstmt.setInt(3, quantity);
             pstmt.setString(4, notes);
+            pstmt.setDate(5, restockDate);
 
             pstmt.executeUpdate();
             rs = pstmt.getGeneratedKeys();
@@ -59,10 +57,11 @@ public class RestockDAO {
 
             // STEP 4: Update inventory with new quantity
             int newQuantity = currentQuantity + quantity;
-            String updateInventorySql = "UPDATE inventory_item SET quantity_on_hand = ?, last_restocked = CURDATE() WHERE item_id = ?";
+            String updateInventorySql = "UPDATE inventory_item SET quantity_on_hand = ?, last_restocked = ? WHERE item_id = ?";
             pstmt = conn.prepareStatement(updateInventorySql);
             pstmt.setInt(1, newQuantity);
-            pstmt.setLong(2, itemId);
+            pstmt.setDate(2, restockDate);
+            pstmt.setLong(3, itemId);
             pstmt.executeUpdate();
             pstmt.close();
 
