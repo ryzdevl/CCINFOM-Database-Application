@@ -38,11 +38,12 @@ public class BeachResortManagementGUI extends JFrame {
     private final Color WARNING_COLOR = new Color(241, 196, 15);
     private final Color DANGER_COLOR = new Color(231, 76, 60);
     private final Color BG_COLOR = new Color(236, 240, 241);
+    private final Color TEXT_COLOR = new Color(0, 0, 0);
 
     public BeachResortManagementGUI() {
         setTitle("Beach Resort Management System - CCINFOM S27-06");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1400, 900);
+        setSize(1400, 800);
         setLocationRelativeTo(null);
 
         // Initialize components first
@@ -134,11 +135,11 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBorder(new EmptyBorder(15, 20, 15, 20));
 
         JLabel titleLabel = new JLabel("🏖️ Beach Resort Management System");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 22));
         titleLabel.setForeground(Color.WHITE);
 
         JLabel subtitleLabel = new JLabel("Group 6 - Bondoc, Malapitan, Mariano, Pamintuan");
-        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        subtitleLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
         subtitleLabel.setForeground(new Color(236, 240, 241));
 
         JPanel textPanel = new JPanel(new GridLayout(2, 1));
@@ -190,7 +191,7 @@ public class BeachResortManagementGUI extends JFrame {
 
     private JLabel createMenuSection(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        label.setFont(new Font("Segoe UI Emoji", Font.BOLD, 11));
         label.setForeground(new Color(149, 165, 166));
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
         label.setBorder(new EmptyBorder(10, 15, 5, 15));
@@ -199,8 +200,8 @@ public class BeachResortManagementGUI extends JFrame {
 
     private JButton createMenuButton(String text, String panelName) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
+        button.setForeground(Color.BLACK);
         button.setBackground(new Color(44, 62, 80));
         button.setBorder(new EmptyBorder(12, 15, 12, 15));
         button.setFocusPainted(false);
@@ -248,11 +249,11 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBorder(new EmptyBorder(8, 20, 8, 20));
 
         statusLabel = new JLabel("Ready - Database connected");
-        statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        statusLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
         statusLabel.setForeground(Color.WHITE);
 
         JLabel timeLabel = new JLabel(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        timeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        timeLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
         timeLabel.setForeground(new Color(189, 195, 199));
 
         panel.add(statusLabel, BorderLayout.WEST);
@@ -273,7 +274,7 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JLabel titleLabel = new JLabel("Dashboard Overview");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
         panel.add(titleLabel, BorderLayout.NORTH);
 
         // Stats panel
@@ -324,11 +325,11 @@ public class BeachResortManagementGUI extends JFrame {
         ));
 
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
         titleLabel.setForeground(new Color(127, 140, 141));
 
         JLabel valueLabel = new JLabel(value);
-        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        valueLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 28));
         valueLabel.setForeground(color);
 
         card.add(titleLabel, BorderLayout.NORTH);
@@ -348,10 +349,10 @@ public class BeachResortManagementGUI extends JFrame {
         headerPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("Guest Management");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
 
         JLabel assignLabel = new JLabel("Assigned to: Charles Andrew Bondoc");
-        assignLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
         assignLabel.setForeground(new Color(127, 140, 141));
 
         JPanel titlePanel = new JPanel(new GridLayout(2, 1));
@@ -372,13 +373,13 @@ public class BeachResortManagementGUI extends JFrame {
         };
 
         JTable table = new JTable(model);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
         table.setRowHeight(30);
         table.setSelectionBackground(SECONDARY_COLOR);
-        table.setSelectionForeground(Color.WHITE);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        table.setSelectionForeground(Color.BLACK);
+        table.getTableHeader().setFont(new Font("Segoe UI Emoji", Font.BOLD, 13));
         table.getTableHeader().setBackground(PRIMARY_COLOR);
-        table.getTableHeader().setForeground(Color.WHITE);
+        table.getTableHeader().setForeground(Color.BLACK);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(new LineBorder(new Color(189, 195, 199), 1));
@@ -643,10 +644,10 @@ public class BeachResortManagementGUI extends JFrame {
         headerPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("Room Management");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
 
         JLabel assignLabel = new JLabel("Assigned to: Ryan James Malapitan");
-        assignLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
         assignLabel.setForeground(new Color(127, 140, 141));
 
         JPanel titlePanel = new JPanel(new GridLayout(2, 1));
@@ -667,13 +668,13 @@ public class BeachResortManagementGUI extends JFrame {
         };
 
         JTable table = new JTable(model);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
         table.setRowHeight(30);
         table.setSelectionBackground(SECONDARY_COLOR);
         table.setSelectionForeground(Color.WHITE);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        table.getTableHeader().setFont(new Font("Segoe UI Emoji", Font.BOLD, 13));
         table.getTableHeader().setBackground(PRIMARY_COLOR);
-        table.getTableHeader().setForeground(Color.WHITE);
+        table.getTableHeader().setForeground(Color.BLACK);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(new LineBorder(new Color(189, 195, 199), 1));
@@ -921,9 +922,24 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JLabel titleLabel = new JLabel("Amenity Management - Assigned to: Vener Mariano");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        panel.add(titleLabel, BorderLayout.NORTH);
+        // Header
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+
+        JLabel titleLabel = new JLabel("Amenity Management");
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
+
+        JLabel assignLabel = new JLabel("Assigned to: Vener Mariano");
+        assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
+        assignLabel.setForeground(new Color(127, 140, 141));
+
+        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
+        titlePanel.setOpaque(false);
+        titlePanel.add(titleLabel);
+        titlePanel.add(assignLabel);
+
+        headerPanel.add(titlePanel, BorderLayout.WEST);
+        panel.add(headerPanel, BorderLayout.NORTH);
 
         // Table
         String[] columns = {"Amenity ID", "Name", "Description", "Rate", "Availability", "Rating"};
@@ -935,13 +951,13 @@ public class BeachResortManagementGUI extends JFrame {
         };
 
         JTable table = new JTable(model);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
         table.setRowHeight(30);
         table.setSelectionBackground(SECONDARY_COLOR);
         table.setSelectionForeground(Color.WHITE);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        table.getTableHeader().setFont(new Font("Segoe UI Emoji", Font.BOLD, 13));
         table.getTableHeader().setBackground(PRIMARY_COLOR);
-        table.getTableHeader().setForeground(Color.WHITE);
+        table.getTableHeader().setForeground(Color.BLACK);
 
         JScrollPane scrollPane = new JScrollPane(table);
         panel.add(scrollPane, BorderLayout.CENTER);
@@ -1120,9 +1136,24 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JLabel titleLabel = new JLabel("Inventory Management - Assigned to: Daniel Pamintuan");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        panel.add(titleLabel, BorderLayout.NORTH);
+        // Header
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+
+        JLabel titleLabel = new JLabel("Inventory Management");
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
+
+        JLabel assignLabel = new JLabel("Assigned to: Daniel Pamintuan");
+        assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
+        assignLabel.setForeground(new Color(127, 140, 141));
+
+        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
+        titlePanel.setOpaque(false);
+        titlePanel.add(titleLabel);
+        titlePanel.add(assignLabel);
+
+        headerPanel.add(titlePanel, BorderLayout.WEST);
+        panel.add(headerPanel, BorderLayout.NORTH);
 
         // Table
         String[] columns = {"Item ID", "Name", "Quantity", "Supplier", "Last Restocked"};
@@ -1134,13 +1165,13 @@ public class BeachResortManagementGUI extends JFrame {
         };
 
         JTable table = new JTable(model);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
         table.setRowHeight(30);
         table.setSelectionBackground(SECONDARY_COLOR);
         table.setSelectionForeground(Color.WHITE);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        table.getTableHeader().setFont(new Font("Segoe UI Emoji", Font.BOLD, 13));
         table.getTableHeader().setBackground(PRIMARY_COLOR);
-        table.getTableHeader().setForeground(Color.WHITE);
+        table.getTableHeader().setForeground(Color.BLACK);
 
         JScrollPane scrollPane = new JScrollPane(table);
         panel.add(scrollPane, BorderLayout.CENTER);
@@ -1313,9 +1344,24 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JLabel label = new JLabel("Reservation Booking - Assigned to: Charles Andrew Bondoc");
-        label.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        panel.add(label, BorderLayout.NORTH);
+        // Header
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+
+        JLabel titleLabel = new JLabel("Reservation Booking");
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
+
+        JLabel assignLabel = new JLabel("Assigned to: Charles Andrew Bondoc");
+        assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
+        assignLabel.setForeground(new Color(127, 140, 141));
+
+        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
+        titlePanel.setOpaque(false);
+        titlePanel.add(titleLabel);
+        titlePanel.add(assignLabel);
+
+        headerPanel.add(titlePanel, BorderLayout.WEST);
+        panel.add(headerPanel, BorderLayout.NORTH);
 
         JLabel infoLabel = new JLabel("<html><center>Implement reservation booking transaction<br>" +
                 "Use ReservationDAO.createReservation() method</center></html>");
@@ -1332,9 +1378,24 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JLabel label = new JLabel("Guest Check-In - Assigned to: Charles Andrew Bondoc");
-        label.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        panel.add(label, BorderLayout.NORTH);
+        // Header
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+
+        JLabel titleLabel = new JLabel("Guest Check-in");
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
+
+        JLabel assignLabel = new JLabel("Assigned to: Ryan James Malapitan");
+        assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
+        assignLabel.setForeground(new Color(127, 140, 141));
+
+        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
+        titlePanel.setOpaque(false);
+        titlePanel.add(titleLabel);
+        titlePanel.add(assignLabel);
+
+        headerPanel.add(titlePanel, BorderLayout.WEST);
+        panel.add(headerPanel, BorderLayout.NORTH);
 
         JLabel infoLabel = new JLabel("<html><center>Implement check-in transaction<br>" +
                 "Use ReservationDAO.checkInGuest() method</center></html>");
@@ -1351,9 +1412,24 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JLabel label = new JLabel("Guest Check-Out - Assigned to: Daniel Pamintuan");
-        label.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        panel.add(label, BorderLayout.NORTH);
+        // Header
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+
+        JLabel titleLabel = new JLabel("Guest Check-out");
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
+
+        JLabel assignLabel = new JLabel("Assigned to: Daniel Pamintuan");
+        assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
+        assignLabel.setForeground(new Color(127, 140, 141));
+
+        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
+        titlePanel.setOpaque(false);
+        titlePanel.add(titleLabel);
+        titlePanel.add(assignLabel);
+
+        headerPanel.add(titlePanel, BorderLayout.WEST);
+        panel.add(headerPanel, BorderLayout.NORTH);
 
         JLabel infoLabel = new JLabel("<html><center>Implement check-out and billing transaction<br>" +
                 "Use CheckOutDAO.processCheckOut() method</center></html>");
@@ -1370,9 +1446,24 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JLabel label = new JLabel("Inventory Restocking - Assigned to: Vener Mariano");
-        label.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        panel.add(label, BorderLayout.NORTH);
+        // Header
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+
+        JLabel titleLabel = new JLabel("Inventory Restocking");
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
+
+        JLabel assignLabel = new JLabel("Assigned to: Vener Mariano");
+        assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
+        assignLabel.setForeground(new Color(127, 140, 141));
+
+        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
+        titlePanel.setOpaque(false);
+        titlePanel.add(titleLabel);
+        titlePanel.add(assignLabel);
+
+        headerPanel.add(titlePanel, BorderLayout.WEST);
+        panel.add(headerPanel, BorderLayout.NORTH);
 
         JLabel infoLabel = new JLabel("<html><center>Implement inventory restock transaction<br>" +
                 "Use RestockDAO.processRestock() method</center></html>");
@@ -1389,9 +1480,24 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JLabel label = new JLabel("Amenity Rental - Assigned to: Ryan James Malapitan");
-        label.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        panel.add(label, BorderLayout.NORTH);
+        // Header
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+
+        JLabel titleLabel = new JLabel("Amenity Rental");
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
+
+        JLabel assignLabel = new JLabel("Assigned to: Ryan James Malapitan");
+        assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
+        assignLabel.setForeground(new Color(127, 140, 141));
+
+        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
+        titlePanel.setOpaque(false);
+        titlePanel.add(titleLabel);
+        titlePanel.add(assignLabel);
+
+        headerPanel.add(titlePanel, BorderLayout.WEST);
+        panel.add(headerPanel, BorderLayout.NORTH);
 
         JLabel infoLabel = new JLabel("<html><center>Implement amenity rental transaction<br>" +
                 "Use AmenityRentalDAO.processAmenityRental() method</center></html>");
@@ -1409,7 +1515,7 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JLabel titleLabel = new JLabel("Reports Generation");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
         panel.add(titleLabel, BorderLayout.NORTH);
 
         JPanel reportsPanel = new JPanel(new GridLayout(2, 2, 15, 15));
@@ -1465,15 +1571,15 @@ public class BeachResortManagementGUI extends JFrame {
         ));
 
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 18));
         titleLabel.setForeground(color);
 
         JLabel descLabel = new JLabel("<html>" + description + "</html>");
-        descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        descLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
         descLabel.setForeground(new Color(127, 140, 141));
 
         JLabel assignLabel = new JLabel(assignedTo);
-        assignLabel.setFont(new Font("Segoe UI", Font.ITALIC, 11));
+        assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 11));
         assignLabel.setForeground(new Color(149, 165, 166));
 
         JPanel textPanel = new JPanel();
@@ -1553,7 +1659,7 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JLabel headerLabel = new JLabel(title + " - " + getMonthName(month) + " " + year);
-        headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        headerLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 18));
         panel.add(headerLabel, BorderLayout.NORTH);
 
         DefaultTableModel model = new DefaultTableModel(columns, 0);
@@ -1562,9 +1668,9 @@ public class BeachResortManagementGUI extends JFrame {
         }
 
         JTable table = new JTable(model);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
         table.setRowHeight(25);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        table.getTableHeader().setFont(new Font("Segoe UI Emoji", Font.BOLD, 13));
 
         JScrollPane scrollPane = new JScrollPane(table);
         panel.add(scrollPane, BorderLayout.CENTER);
@@ -1591,8 +1697,8 @@ public class BeachResortManagementGUI extends JFrame {
     // Helper methods
     private JButton createActionButton(String text, Color color) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
+        button.setForeground(Color.BLACK);
         button.setBackground(color);
         button.setBorder(new EmptyBorder(8, 15, 8, 15));
         button.setFocusPainted(false);
