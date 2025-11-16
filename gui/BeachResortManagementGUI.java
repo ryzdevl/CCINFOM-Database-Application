@@ -284,7 +284,7 @@ public class BeachResortManagementGUI extends JFrame {
         statsPanel.add(createStatCard("Total Guests", "Click Refresh", SUCCESS_COLOR));
         statsPanel.add(createStatCard("Active Reservations", "Click Refresh", PRIMARY_COLOR));
         statsPanel.add(createStatCard("Available Rooms", "Click Refresh", SUCCESS_COLOR));
-        statsPanel.add(createStatCard("Revenue Today", "$0.00", WARNING_COLOR));
+        statsPanel.add(createStatCard("Revenue Today", "₱0.00", WARNING_COLOR));
         statsPanel.add(createStatCard("Occupied Rooms", "Click Refresh", DANGER_COLOR));
         statsPanel.add(createStatCard("Amenities Rented", "Click Refresh", SECONDARY_COLOR));
         statsPanel.add(createStatCard("Inventory Items", "Click Refresh", new Color(155, 89, 182)));
@@ -727,7 +727,7 @@ public class BeachResortManagementGUI extends JFrame {
                         room.getRoomType(),
                         room.getBedType(),
                         room.getMaxCapacity(),
-                        String.format("$%.2f", room.getRatePerNight()),
+                        String.format("₱%.2f", room.getRatePerNight()),
                         room.getStatus()
                 });
             }
@@ -1003,7 +1003,7 @@ public class BeachResortManagementGUI extends JFrame {
                         amenity.getAmenityId(),
                         amenity.getName(),
                         amenity.getDescription(),
-                        String.format("$%.2f", amenity.getRate()),
+                        String.format("₱%.2f", amenity.getRate()),
                         amenity.getAvailability(),
                         amenity.getOverallRating() != null ? amenity.getOverallRating() : "N/A"
                 });
@@ -1568,7 +1568,7 @@ public class BeachResortManagementGUI extends JFrame {
                 double totalCost = nights * room.getRatePerNight();
 
                 roomInfoLabel.setText(String.format(
-                        "✓ %s (%s) - $%.2f/night - Available for %d nights - Total: $%.2f",
+                        "✓ %s (%s) - ₱%.2f/night - Available for %d nights - Total: ₱%.2f",
                         room.getRoomCode(), room.getRoomType(), room.getRatePerNight(), nights, totalCost
                 ));
                 roomInfoLabel.setForeground(SUCCESS_COLOR);
@@ -1598,7 +1598,7 @@ public class BeachResortManagementGUI extends JFrame {
 
             for (int i = 0; i < amenities.size() && i < amenityCheckboxes.length; i++) {
                 Amenity amenity = amenities.get(i);
-                String label = String.format("%s - $%.2f", amenity.getName(), amenity.getRate());
+                String label = String.format("%s - ₱%.2f", amenity.getName(), amenity.getRate());
                 amenityCheckboxes[i] = new JCheckBox(label);
                 amenityCheckboxes[i].putClientProperty("amenityId", amenity.getAmenityId());
                 amenityPanel.add(amenityCheckboxes[i]);
