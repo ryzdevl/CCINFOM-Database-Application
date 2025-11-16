@@ -337,4 +337,32 @@ public class ReservationDAO {
         }
         return list;
     }
+
+    public List<Reservation> getCheckedInReservationsByGuestId(Long guestId) throws SQLException {
+        List<Reservation> reservations = new ArrayList<>();
+
+        String sql = "SELECT reservation_id, guest_id, room_id, check_in, check_out, status " +
+                "FROM reservation WHERE guest_id = ? AND status = 'checked-in'";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, guestId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Reservation r = new Reservation();
+                r.setReservationId(rs.getLong("reservation_id"));
+                r.setGuestId(rs.getLong("guest_id"));
+                r.setRoomId(rs.getLong("room_id"));
+                r.setCheckIn(rs.getDate("check_in").toLocalDate());
+                r.setCheckOut(rs.getDate("check_out") != null ? rs.getDate("check_out").toLocalDate() : null);
+                r.setStatus(rs.getString("status"));
+
+                reservations.add(r);
+            }
+        }
+
+        return reservations;
+    }
 }
