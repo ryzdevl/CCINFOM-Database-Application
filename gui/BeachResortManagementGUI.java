@@ -1338,38 +1338,110 @@ public class BeachResortManagementGUI extends JFrame {
         }
     }
 
-    // RESERVATION BOOKING - Placeholder
-    private JPanel createReservationBookingPanel() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBackground(BG_COLOR);
-        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+    // RESERVATION BOOKING - Full Implementation (Charles Andrew Bondoc)
+    private void createReservation(JTextField guestIdField, JTextField roomIdField,
+                                   JTextField checkInField, JTextField checkOutField,
+                                   JComboBox<String> channelCombo, JCheckBox[] amenityCheckboxes) {
+        try {
+            if (reservationDAO == null) {
+                showError("Database not connected");
+                return;
+            }
 
-        // Header
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setOpaque(false);
+            // Validate inputs
+            if (guestIdField.getText().trim().isEmpty() || roomIdField.getText().trim().isEmpty()) {
+                showError("Please fill in Guest ID and Room ID");
+                return;
+            }
 
-        JLabel titleLabel = new JLabel("Reservation Booking");
-        titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
+            // Parse data
+            Long guestId = Long.parseLong(guestIdField.getText().trim());
+            Long roomId = Long.parseLong(roomIdField.getText().trim());
+            LocalDate checkIn = LocalDate.parse(checkInField.getText().trim());
+            LocalDate checkOut = LocalDate.parse(checkOutField.getText().trim());
+            String bookingChannel = (String) channelCombo.getSelectedItem();
 
-        JLabel assignLabel = new JLabel("Assigned to: Charles Andrew Bondoc");
-        assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
-        assignLabel.setForeground(new Color(127, 140, 141));
+            // Validate dates
+            if (checkOut.isBefore(checkIn) || checkOut.isEqual(checkIn)) {
+                showError("Check-out date must be after check-in date!");
+                return;
+            }
 
-        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
-        titlePanel.setOpaque(false);
-        titlePanel.add(titleLabel);
-        titlePanel.add(assignLabel);
+            if (checkIn.isBefore(LocalDate.now())) {
+                showError("Check-in date cannot be in the past!");
+                return;
+            }
 
-        headerPanel.add(titlePanel, BorderLayout.WEST);
-        panel.add(headerPanel, BorderLayout.NORTH);
+            // Collect selected amenities
+            List<Long> selectedAmenities = new ArrayList<>();
+            for (JCheckBox cb : amenityCheckboxes) {
+                if (cb != null && cb.isSelected()) {
+                    Long amenityId = (Long) cb.getClientProperty("amenityId");
+                    if (amenityId != null) {
+                        selectedAmenities.add(amenityId);
+                    }
+                }
+            }
 
-        JLabel infoLabel = new JLabel("<html><center>Implement reservation booking transaction<br>" +
-                "Use ReservationDAO.createReservation() method</center></html>");
-        infoLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(infoLabel, BorderLayout.CENTER);
+            // Create reservation object
+            Reservation reservation = new Reservation(guestId, roomId, checkIn, checkOut, bookingChannel);
 
-        return panel;
+            // Confirm before creating
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    String.format("Create reservation:\n\n" +
+                                    "Guest ID: %d\n" +
+                                    "Room ID: %d\n" +
+                                    "Check-In: %s\n" +
+                                    "Check-Out: %s\n" +
+                                    "Channel: %s\n" +
+                                    "Amenities: %d selected\n\n" +
+                                    "Proceed?",
+                            guestId, roomId, checkIn, checkOut, bookingChannel, selectedAmenities.size()),
+                    "Confirm Reservation",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            // Call DAO to create reservation (with transaction)
+            Long reservationId = reservationDAO.createReservation(reservation, selectedAmenities);
+
+            // Success message
+            JOptionPane.showMessageDialog(this,
+                    String.format("Reservation created successfully!\n\n" +
+                                    "Reservation ID: %d\n" +
+                                    "Status: Confirmed\n\n" +
+                                    "The room status has been updated to 'reserved'.\n" +
+                                    "Selected amenities have been linked to the reservation.",
+                            reservationId),
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            updateStatus("Reservation #" + reservationId + " created successfully");
+
+            // Clear form
+            guestIdField.setText("");
+            roomIdField.setText("");
+            checkInField.setText(LocalDate.now().toString());
+            checkOutField.setText(LocalDate.now().plusDays(3).toString());
+            channelCombo.setSelectedIndex(1);
+            for (JCheckBox cb : amenityCheckboxes) {
+                if (cb != null) cb.setSelected(false);
+            }
+
+        } catch (NumberFormatException e) {
+            showError("Invalid ID format. Please enter valid numbers for Guest ID and Room ID.");
+        } catch (java.time.format.DateTimeParseException e) {
+            showError("Invalid date format. Please use YYYY-MM-DD format (e.g., 2025-12-25)");
+        } catch (SQLException e) {
+            showError("Error creating reservation: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            showError("Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     // CHECK-IN - Placeholder
@@ -1748,3 +1820,4 @@ public class BeachResortManagementGUI extends JFrame {
         });
     }
 }
+
