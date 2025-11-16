@@ -1932,36 +1932,232 @@ public class BeachResortManagementGUI extends JFrame {
         return panel;
     }
 
+    private void updateReservationInfo(Reservation r, JLabel label, JTextField chargeField) {
+        if (r == null) return;
+        try {
+            label.setText("Reservation ID " + r.getReservationId() +
+                    ", Room " + r.getRoomId() + ", Status " + r.getStatus());
+
+            double total = checkOutDAO.calculateTotalCharges(r.getReservationId());
+            chargeField.setText(String.valueOf(total));
+
+        } catch (SQLException ex) {
+            label.setText("Error loading reservation details.");
+        }
+    }
+
     // CHECK-OUT - Placeholder
     private JPanel createCheckOutPanel() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        JPanel panel = new JPanel(new BorderLayout(15, 15));
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // Header
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setOpaque(false);
-
-        JLabel titleLabel = new JLabel("Guest Check-out");
+        // ---- Header ----
+        JLabel titleLabel = new JLabel("Guest Check-Out & Billing Settlement");
         titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
 
-        JLabel assignLabel = new JLabel("Assigned to: Daniel Pamintuan");
+        JLabel assignLabel = new JLabel("Assigned to: Ryan James Malapitan");
         assignLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
         assignLabel.setForeground(new Color(127, 140, 141));
 
-        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
-        titlePanel.setOpaque(false);
-        titlePanel.add(titleLabel);
-        titlePanel.add(assignLabel);
+        JPanel headerPanel = new JPanel(new GridLayout(2, 1));
+        headerPanel.setOpaque(false);
+        headerPanel.add(titleLabel);
+        headerPanel.add(assignLabel);
 
-        headerPanel.add(titlePanel, BorderLayout.WEST);
         panel.add(headerPanel, BorderLayout.NORTH);
 
-        JLabel infoLabel = new JLabel("<html><center>Implement check-out and billing transaction<br>" +
-                "Use CheckOutDAO.processCheckOut() method</center></html>");
-        infoLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(infoLabel, BorderLayout.CENTER);
+        // ---- Form Panel ----
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(Color.WHITE);
+        formPanel.setBorder(new CompoundBorder(
+                new LineBorder(new Color(189, 195, 199), 1),
+                new EmptyBorder(20, 20, 20, 20)
+        ));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        // Guest ID
+        gbc.gridx = 0; gbc.gridy = 0;
+        formPanel.add(new JLabel("Guest ID:"), gbc);
+
+        gbc.gridx = 1;
+        JTextField guestIdField = new JTextField(15);
+        formPanel.add(guestIdField, gbc);
+
+        gbc.gridx = 2;
+        JButton searchGuestBtn = createActionButton("🔍 Search Guest", PRIMARY_COLOR);
+        formPanel.add(searchGuestBtn, gbc);
+
+        // Guest info
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 3;
+        JLabel guestInfoLabel = new JLabel("");
+        guestInfoLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
+        guestInfoLabel.setForeground(PRIMARY_COLOR);
+        formPanel.add(guestInfoLabel, gbc);
+
+        // Reservation combo
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Select Reservation:"), gbc);
+
+        gbc.gridx = 1; gbc.gridwidth = 2;
+        JComboBox<Reservation> reservationCombo = new JComboBox<>();
+
+        reservationCombo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                    JList<?> list, Object value,
+                    int index, boolean isSelected, boolean cellHasFocus) {
+
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                if (value instanceof Reservation res) {
+                    setText("ID: " + res.getReservationId() +
+                            " | Room: " + res.getRoomId() +
+                            " | Status: " + res.getStatus());
+                }
+                return this;
+            }
+        });
+
+        formPanel.add(reservationCombo, gbc);
+
+        // Reservation info
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 3;
+        JLabel reservationInfoLabel = new JLabel("");
+        reservationInfoLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
+        reservationInfoLabel.setForeground(SUCCESS_COLOR);
+        formPanel.add(reservationInfoLabel, gbc);
+
+        // Total charges
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Total Charges:"), gbc);
+
+        gbc.gridx = 1;
+        JTextField totalChargeField = new JTextField(15);
+        totalChargeField.setEditable(false);
+        formPanel.add(totalChargeField, gbc);
+
+        // Amount paid
+        gbc.gridx = 0; gbc.gridy = 5;
+        formPanel.add(new JLabel("Amount Paid:"), gbc);
+
+        gbc.gridx = 1;
+        JTextField amountPaidField = new JTextField(15);
+        formPanel.add(amountPaidField, gbc);
+
+        // Payment method
+        gbc.gridx = 0; gbc.gridy = 6;
+        formPanel.add(new JLabel("Payment Method:"), gbc);
+
+        gbc.gridx = 1;
+        JComboBox<String> paymentMethodBox = new JComboBox<>(
+                new String[]{"Cash", "Card", "Online", "Bank_Transfer", "Other_Mode"}
+        );
+        formPanel.add(paymentMethodBox, gbc);
+
+        // Transaction reference
+        gbc.gridx = 0; gbc.gridy = 7;
+        formPanel.add(new JLabel("Transaction Ref:"), gbc);
+
+        gbc.gridx = 1;
+        JTextField transactionRefField = new JTextField(15);
+        formPanel.add(transactionRefField, gbc);
+
+        // Add form panel
+        panel.add(formPanel, BorderLayout.CENTER);
+
+        // ---- Action Panel ----
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        actionPanel.setOpaque(false);
+
+        JButton checkOutBtn = createActionButton("📤 Confirm Check-Out", DANGER_COLOR);
+        checkOutBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
+
+        actionPanel.add(checkOutBtn);
+        panel.add(actionPanel, BorderLayout.SOUTH);
+
+        // ---- EVENT HANDLERS ----
+
+        // Search guest → load checked-in reservations
+        searchGuestBtn.addActionListener(e -> {
+            try {
+                long guestId = Long.parseLong(guestIdField.getText().trim());
+
+                Guest guest = guestDAO.getGuestById(guestId);
+                reservationCombo.removeAllItems();
+
+                if (guest != null) {
+                    guestInfoLabel.setText("Guest: " + guest.getFirstName() + " " + guest.getLastName());
+
+                    List<Reservation> reservations =
+                            reservationDAO.getCheckedInReservationsByGuestId(guestId);
+
+                    if (reservations.isEmpty()) {
+                        reservationInfoLabel.setText("No CHECKED-IN reservations for this guest.");
+                    } else {
+                        for (Reservation r : reservations) reservationCombo.addItem(r);
+
+                        Reservation selected = (Reservation) reservationCombo.getSelectedItem();
+                        updateReservationInfo(selected, reservationInfoLabel, totalChargeField);
+
+                    }
+                } else {
+                    guestInfoLabel.setText("Guest not found.");
+                    reservationInfoLabel.setText("");
+                }
+
+            } catch (Exception ex) {
+                guestInfoLabel.setText("Error: " + ex.getMessage());
+            }
+        });
+
+        // Load details when selecting reservation
+        reservationCombo.addActionListener(e -> {
+            Reservation selected = (Reservation) reservationCombo.getSelectedItem();
+            updateReservationInfo(selected, reservationInfoLabel, totalChargeField);
+        });
+
+        // Process Check-Out
+        checkOutBtn.addActionListener(e -> {
+
+            Reservation selected = (Reservation) reservationCombo.getSelectedItem();
+            if (selected == null) {
+                JOptionPane.showMessageDialog(null, "Please select a reservation.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                double amountPaid = Double.parseDouble(amountPaidField.getText());
+                String method = paymentMethodBox.getSelectedItem().toString();
+                String reference = transactionRefField.getText();
+
+                int confirm = JOptionPane.showConfirmDialog(null,
+                        "Confirm CHECK-OUT for Reservation ID: " + selected.getReservationId() + " ?",
+                        "Confirm Check-Out", JOptionPane.YES_NO_OPTION);
+
+                if (confirm == JOptionPane.YES_OPTION) {
+
+                    boolean ok = checkOutDAO.processCheckOut(
+                            selected.getReservationId(),
+                            amountPaid,
+                            method,
+                            reference
+                    );
+
+                    if (ok) {
+                        JOptionPane.showMessageDialog(null, "Guest checked out successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        reservationInfoLabel.setText("Reservation checked out successfully.");
+                    }
+                }
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        });
 
         return panel;
     }
