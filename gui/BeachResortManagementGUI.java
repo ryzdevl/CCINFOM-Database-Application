@@ -1338,6 +1338,281 @@ public class BeachResortManagementGUI extends JFrame {
         }
     }
 
+    private JPanel createReservationBookingPanel() {
+        JPanel panel = new JPanel(new BorderLayout(15, 15));
+        panel.setBackground(BG_COLOR);
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        JLabel titleLabel = new JLabel("Reservation Booking");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+
+        JLabel assignLabel = new JLabel("Assigned to: Charles Andrew Bondoc");
+        assignLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        assignLabel.setForeground(new Color(127, 140, 141));
+
+        JPanel headerPanel = new JPanel(new GridLayout(2, 1));
+        headerPanel.setOpaque(false);
+        headerPanel.add(titleLabel);
+        headerPanel.add(assignLabel);
+
+        panel.add(headerPanel, BorderLayout.NORTH);
+
+        // Form panel
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(Color.WHITE);
+        formPanel.setBorder(new CompoundBorder(
+                new LineBorder(new Color(189, 195, 199), 1),
+                new EmptyBorder(20, 20, 20, 20)
+        ));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        // Guest ID field with search
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Guest ID:"), gbc);
+
+        gbc.gridx = 1; gbc.gridwidth = 1;
+        JTextField guestIdField = new JTextField(15);
+        formPanel.add(guestIdField, gbc);
+
+        gbc.gridx = 2;
+        JButton searchGuestBtn = createActionButton("🔍 Search Guest", PRIMARY_COLOR);
+        JLabel guestInfoLabel = new JLabel("");
+        searchGuestBtn.addActionListener(e -> searchGuest(guestIdField, guestInfoLabel));
+        formPanel.add(searchGuestBtn, gbc);
+
+        // Guest info display
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 3;
+        guestInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        guestInfoLabel.setForeground(SUCCESS_COLOR);
+        formPanel.add(guestInfoLabel, gbc);
+
+        // Room ID field with availability check
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Room ID:"), gbc);
+
+        gbc.gridx = 1;
+        JTextField roomIdField = new JTextField(15);
+        formPanel.add(roomIdField, gbc);
+
+        gbc.gridx = 2;
+        JButton checkAvailBtn = createActionButton("Check Availability", SUCCESS_COLOR);
+        JLabel roomInfoLabel = new JLabel("");
+        formPanel.add(checkAvailBtn, gbc);
+
+        // Room info display
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 3;
+        roomInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        roomInfoLabel.setForeground(SUCCESS_COLOR);
+        formPanel.add(roomInfoLabel, gbc);
+
+        // Check-in Date
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Check-In Date (YYYY-MM-DD):"), gbc);
+
+        gbc.gridx = 1; gbc.gridwidth = 2;
+        JTextField checkInField = new JTextField(15);
+        checkInField.setText(LocalDate.now().toString());
+        formPanel.add(checkInField, gbc);
+
+        // Check-out Date
+        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Check-Out Date (YYYY-MM-DD):"), gbc);
+
+        gbc.gridx = 1; gbc.gridwidth = 2;
+        JTextField checkOutField = new JTextField(15);
+        checkOutField.setText(LocalDate.now().plusDays(3).toString());
+        formPanel.add(checkOutField, gbc);
+
+        // Booking Channel
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Booking Channel:"), gbc);
+
+        gbc.gridx = 1; gbc.gridwidth = 2;
+        JComboBox<String> channelCombo = new JComboBox<>(new String[]{"walk-in", "online", "phone", "agent"});
+        channelCombo.setSelectedIndex(1); // Default to online
+        formPanel.add(channelCombo, gbc);
+
+        // Amenities selection
+        gbc.gridx = 0; gbc.gridy = 7; gbc.gridwidth = 3;
+        JLabel amenityLabel = new JLabel("Select Amenities (Optional):");
+        amenityLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        formPanel.add(amenityLabel, gbc);
+
+        gbc.gridy = 8;
+        JPanel amenityPanel = new JPanel(new GridLayout(0, 2, 10, 5));
+        amenityPanel.setOpaque(false);
+
+        // Load amenities dynamically
+        JCheckBox[] amenityCheckboxes = new JCheckBox[8];
+        JButton loadAmenitiesBtn = createActionButton("Load Available Amenities", SECONDARY_COLOR);
+        loadAmenitiesBtn.addActionListener(e -> loadAmenitiesForBooking(amenityPanel, amenityCheckboxes));
+        formPanel.add(loadAmenitiesBtn, gbc);
+
+        gbc.gridy = 9;
+        formPanel.add(amenityPanel, gbc);
+
+        // Availability check button action
+        checkAvailBtn.addActionListener(e -> checkRoomAvailability(
+                roomIdField, checkInField, checkOutField, roomInfoLabel
+        ));
+
+        panel.add(formPanel, BorderLayout.CENTER);
+
+        // Action buttons
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        actionPanel.setOpaque(false);
+
+        JButton bookBtn = createActionButton("✅ Create Reservation", SUCCESS_COLOR);
+        bookBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        bookBtn.addActionListener(e -> createReservation(
+                guestIdField, roomIdField, checkInField, checkOutField,
+                channelCombo, amenityCheckboxes
+        ));
+
+        JButton clearBtn = createActionButton("🔄 Clear Form", WARNING_COLOR);
+        clearBtn.addActionListener(e -> {
+            guestIdField.setText("");
+            roomIdField.setText("");
+            checkInField.setText(LocalDate.now().toString());
+            checkOutField.setText(LocalDate.now().plusDays(3).toString());
+            guestInfoLabel.setText("");
+            roomInfoLabel.setText("");
+            channelCombo.setSelectedIndex(1);
+            for (JCheckBox cb : amenityCheckboxes) {
+                if (cb != null) cb.setSelected(false);
+            }
+        });
+
+        actionPanel.add(bookBtn);
+        actionPanel.add(clearBtn);
+
+        panel.add(actionPanel, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void searchGuest(JTextField guestIdField, JLabel guestInfoLabel) {
+        try {
+            if (guestDAO == null) {
+                showError("Database not connected");
+                return;
+            }
+
+            String guestIdText = guestIdField.getText().trim();
+            if (guestIdText.isEmpty()) {
+                showError("Please enter a Guest ID");
+                return;
+            }
+
+            Long guestId = Long.parseLong(guestIdText);
+            Guest guest = guestDAO.getGuestById(guestId);
+
+            if (guest != null) {
+                guestInfoLabel.setText("✓ Guest found: " + guest.getFullName() + " (" + guest.getEmail() + ")");
+                guestInfoLabel.setForeground(SUCCESS_COLOR);
+                updateStatus("Guest verified: " + guest.getFullName());
+            } else {
+                guestInfoLabel.setText("✗ Guest not found");
+                guestInfoLabel.setForeground(DANGER_COLOR);
+                showError("Guest with ID " + guestId + " not found!");
+            }
+        } catch (NumberFormatException e) {
+            showError("Invalid Guest ID format. Please enter a number.");
+        } catch (SQLException e) {
+            showError("Error searching guest: " + e.getMessage());
+        }
+    }
+
+    private void checkRoomAvailability(JTextField roomIdField, JTextField checkInField,
+                                       JTextField checkOutField, JLabel roomInfoLabel) {
+        try {
+            if (roomDAO == null) {
+                showError("Database not connected");
+                return;
+            }
+
+            String roomIdText = roomIdField.getText().trim();
+            if (roomIdText.isEmpty()) {
+                showError("Please enter a Room ID");
+                return;
+            }
+
+            Long roomId = Long.parseLong(roomIdText);
+            Room room = roomDAO.getRoomById(roomId);
+
+            if (room == null) {
+                roomInfoLabel.setText("✗ Room not found");
+                roomInfoLabel.setForeground(DANGER_COLOR);
+                showError("Room with ID " + roomId + " not found!");
+                return;
+            }
+
+            // Parse dates
+            LocalDate checkIn = LocalDate.parse(checkInField.getText().trim());
+            LocalDate checkOut = LocalDate.parse(checkOutField.getText().trim());
+
+            // Validate dates
+            if (checkOut.isBefore(checkIn) || checkOut.isEqual(checkIn)) {
+                showError("Check-out date must be after check-in date!");
+                return;
+            }
+
+            // Check availability
+            boolean isAvailable = roomDAO.isRoomAvailable(roomId, checkIn, checkOut);
+
+            if (isAvailable) {
+                long nights = java.time.temporal.ChronoUnit.DAYS.between(checkIn, checkOut);
+                double totalCost = nights * room.getRatePerNight();
+
+                roomInfoLabel.setText(String.format(
+                        "✓ %s (%s) - $%.2f/night - Available for %d nights - Total: $%.2f",
+                        room.getRoomCode(), room.getRoomType(), room.getRatePerNight(), nights, totalCost
+                ));
+                roomInfoLabel.setForeground(SUCCESS_COLOR);
+                updateStatus("Room available for selected dates");
+            } else {
+                roomInfoLabel.setText("✗ Room NOT available for selected dates");
+                roomInfoLabel.setForeground(DANGER_COLOR);
+                showError("Room is not available for the selected dates. Please choose different dates.");
+            }
+
+        } catch (NumberFormatException e) {
+            showError("Invalid Room ID format. Please enter a number.");
+        } catch (Exception e) {
+            showError("Error checking availability: " + e.getMessage());
+        }
+    }
+
+    private void loadAmenitiesForBooking(JPanel amenityPanel, JCheckBox[] amenityCheckboxes) {
+        try {
+            if (amenityDAO == null) {
+                showError("Database not connected");
+                return;
+            }
+
+            amenityPanel.removeAll();
+            List<Amenity> amenities = amenityDAO.getAllAmenities("available");
+
+            for (int i = 0; i < amenities.size() && i < amenityCheckboxes.length; i++) {
+                Amenity amenity = amenities.get(i);
+                String label = String.format("%s - $%.2f", amenity.getName(), amenity.getRate());
+                amenityCheckboxes[i] = new JCheckBox(label);
+                amenityCheckboxes[i].putClientProperty("amenityId", amenity.getAmenityId());
+                amenityPanel.add(amenityCheckboxes[i]);
+            }
+
+            amenityPanel.revalidate();
+            amenityPanel.repaint();
+            updateStatus("Loaded " + amenities.size() + " available amenities");
+
+        } catch (SQLException e) {
+            showError("Error loading amenities: " + e.getMessage());
+        }
+    }
+
     // RESERVATION BOOKING - Full Implementation (Charles Andrew Bondoc)
     private void createReservation(JTextField guestIdField, JTextField roomIdField,
                                    JTextField checkInField, JTextField checkOutField,
@@ -1820,4 +2095,3 @@ public class BeachResortManagementGUI extends JFrame {
         });
     }
 }
-
