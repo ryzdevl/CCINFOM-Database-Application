@@ -299,4 +299,42 @@ public class ReservationDAO {
             DatabaseConnection.closeConnection(conn);
         }
     }
+
+    public List<Reservation> getActiveReservationsByGuestId(Long guestId) throws SQLException {
+        List<Reservation> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseConnection.getConnection();
+            String sql = "SELECT r.*, rm.room_code, g.first_name, g.last_name " +
+                    "FROM reservation r " +
+                    "JOIN room rm ON r.room_id = rm.room_id " +
+                    "JOIN guest g ON r.guest_id = g.guest_id " +
+                    "WHERE r.guest_id = ? AND r.status IN ('confirmed')";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, guestId);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Reservation res = new Reservation();
+                res.setReservationId(rs.getLong("reservation_id"));
+                res.setGuestId(rs.getLong("guest_id"));
+                res.setRoomId(rs.getLong("room_id"));
+                res.setCheckIn(rs.getDate("check_in").toLocalDate());
+                res.setCheckOut(rs.getDate("check_out").toLocalDate());
+                res.setBookingChannel(rs.getString("booking_channel"));
+                res.setStatus(rs.getString("status"));
+                res.setGuestName(rs.getString("first_name") + " " + rs.getString("last_name"));
+                res.setRoomCode(rs.getString("room_code"));
+                list.add(res);
+            }
+        } finally {
+            if (rs != null) rs.close();
+            if (pstmt != null) pstmt.close();
+            DatabaseConnection.closeConnection(conn);
+        }
+        return list;
+    }
 }
