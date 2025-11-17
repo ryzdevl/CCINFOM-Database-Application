@@ -30,6 +30,7 @@ public class BeachResortManagementGUI extends JFrame {
     private RestockDAO restockDAO;
     private AmenityRentalDAO amenityRentalDAO;
     private ReportsDAO reportsDAO;
+    private DashboardDAO dashboardDAO;
 
     // Color scheme
     private final Color PRIMARY_COLOR = new Color(41, 128, 185);
@@ -39,6 +40,16 @@ public class BeachResortManagementGUI extends JFrame {
     private final Color DANGER_COLOR = new Color(231, 76, 60);
     private final Color BG_COLOR = new Color(236, 240, 241);
     private final Color TEXT_COLOR = new Color(0, 0, 0);
+
+    //dashboard labels
+    private JLabel totalGuestsLabel;
+    private JLabel activeReservationsLabel;
+    private JLabel availableRoomsLabel;
+    private JLabel revenueTodayLabel;
+    private JLabel occupiedRoomsLabel;
+    private JLabel amenitiesRentedLabel;
+    private JLabel inventoryItemsLabel;
+    private JLabel pendingCheckoutsLabel;
 
     public BeachResortManagementGUI() {
         setTitle("Beach Resort Management System - CCINFOM S27-06");
@@ -82,6 +93,7 @@ public class BeachResortManagementGUI extends JFrame {
             restockDAO = new RestockDAO();
             amenityRentalDAO = new AmenityRentalDAO();
             reportsDAO = new ReportsDAO();
+            dashboardDAO = new DashboardDAO();
             System.out.println("DAOs initialized successfully");
         } catch (Exception e) {
             System.err.println("Error initializing database connection: " + e.getMessage());
@@ -268,7 +280,7 @@ public class BeachResortManagementGUI extends JFrame {
         return panel;
     }
 
-    private JPanel createDashboardPanel() {
+        private JPanel createDashboardPanel() {
         JPanel panel = new JPanel(new BorderLayout(15, 15));
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -277,25 +289,33 @@ public class BeachResortManagementGUI extends JFrame {
         titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
         panel.add(titleLabel, BorderLayout.NORTH);
 
-        // Stats panel
         JPanel statsPanel = new JPanel(new GridLayout(2, 4, 15, 15));
         statsPanel.setOpaque(false);
 
-        statsPanel.add(createStatCard("Total Guests", "Click Refresh", SUCCESS_COLOR));
-        statsPanel.add(createStatCard("Active Reservations", "Click Refresh", PRIMARY_COLOR));
-        statsPanel.add(createStatCard("Available Rooms", "Click Refresh", SUCCESS_COLOR));
-        statsPanel.add(createStatCard("Revenue Today", "₱0.00", WARNING_COLOR));
-        statsPanel.add(createStatCard("Occupied Rooms", "Click Refresh", DANGER_COLOR));
-        statsPanel.add(createStatCard("Amenities Rented", "Click Refresh", SECONDARY_COLOR));
-        statsPanel.add(createStatCard("Inventory Items", "Click Refresh", new Color(155, 89, 182)));
-        statsPanel.add(createStatCard("Pending Checkouts", "Click Refresh", WARNING_COLOR));
+        // Initialize JLabels
+        totalGuestsLabel = new JLabel("0");
+        activeReservationsLabel = new JLabel("0");
+        availableRoomsLabel = new JLabel("0");
+        revenueTodayLabel = new JLabel("₱0.00");
+        occupiedRoomsLabel = new JLabel("0");
+        amenitiesRentedLabel = new JLabel("0");
+        inventoryItemsLabel = new JLabel("0");
+        pendingCheckoutsLabel = new JLabel("0");
+
+        // Add stat cards
+        statsPanel.add(createStatCard("Total Guests", totalGuestsLabel, SUCCESS_COLOR));
+        statsPanel.add(createStatCard("Active Reservations", activeReservationsLabel, PRIMARY_COLOR));
+        statsPanel.add(createStatCard("Available Rooms", availableRoomsLabel, SUCCESS_COLOR));
+        statsPanel.add(createStatCard("Revenue Today", revenueTodayLabel, WARNING_COLOR));
+        statsPanel.add(createStatCard("Occupied Rooms", occupiedRoomsLabel, DANGER_COLOR));
+        statsPanel.add(createStatCard("Amenities Rented", amenitiesRentedLabel, SECONDARY_COLOR));
+        statsPanel.add(createStatCard("Inventory Items", inventoryItemsLabel, new Color(155, 89, 182)));
+        statsPanel.add(createStatCard("Pending Checkouts", pendingCheckoutsLabel, WARNING_COLOR));
 
         panel.add(statsPanel, BorderLayout.CENTER);
 
-        // Refresh button
         JButton refreshBtn = createActionButton("🔄 Refresh Dashboard", SECONDARY_COLOR);
-        refreshBtn.addActionListener(e -> loadDashboardStats(statsPanel));
-
+        refreshBtn.addActionListener(e -> loadDashboardStats());
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setOpaque(false);
         buttonPanel.add(refreshBtn);
@@ -304,19 +324,34 @@ public class BeachResortManagementGUI extends JFrame {
         return panel;
     }
 
-    private void loadDashboardStats(JPanel statsPanel) {
+    private void updateCard(Component card, int index, String value) {
+        if (card instanceof JPanel panel) {
+            Component[] comps = panel.getComponents();
+            JLabel valueLabel = (JLabel) comps[1]; // title = [0], value = [1]
+            valueLabel.setText(value);
+        }
+    }
+    
+    private void loadDashboardStats() {
         try {
-            // This would be implemented with actual queries
-            updateStatus("Dashboard statistics refreshed");
-            JOptionPane.showMessageDialog(this,
-                    "Dashboard refresh functionality ready!\nConnect to database queries for live stats.",
-                    "Info", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception e) {
-            showError("Error loading dashboard: " + e.getMessage());
+            DashboardDAO dao = new DashboardDAO();
+
+            totalGuestsLabel.setText(String.valueOf(dao.getTotalGuests()));
+            activeReservationsLabel.setText(String.valueOf(dao.getActiveReservations()));
+            availableRoomsLabel.setText(String.valueOf(dao.getAvailableRooms()));
+            revenueTodayLabel.setText("₱" + String.format("%.2f", dao.getRevenueToday()));
+            occupiedRoomsLabel.setText(String.valueOf(dao.getOccupiedRooms()));
+            amenitiesRentedLabel.setText(String.valueOf(dao.getAmenitiesRented()));
+            inventoryItemsLabel.setText(String.valueOf(dao.getInventoryItems()));
+            pendingCheckoutsLabel.setText(String.valueOf(dao.getPendingCheckouts()));
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error loading dashboard: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private JPanel createStatCard(String title, String value, Color color) {
+    private JPanel createStatCard(String title, JLabel valueLabel, Color color) {
         JPanel card = new JPanel(new BorderLayout(10, 10));
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createCompoundBorder(
@@ -328,7 +363,6 @@ public class BeachResortManagementGUI extends JFrame {
         titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         titleLabel.setForeground(new Color(127, 140, 141));
 
-        JLabel valueLabel = new JLabel(value);
         valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         valueLabel.setForeground(color);
 
@@ -2601,10 +2635,10 @@ public class BeachResortManagementGUI extends JFrame {
 
             try {
                 // Parse user input to LocalDate, then convert to java.sql.Date
-                LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("YYYY-MM-DD"));
                 restockDate = java.sql.Date.valueOf(localDate);
             } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(panel, "Invalid date format. Please use YYYY-MM-DD format (e.g., 2025-12-25)", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(panel, "Invalid date format! Use YYYY-MM-DD", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
