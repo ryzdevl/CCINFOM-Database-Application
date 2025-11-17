@@ -1128,7 +1128,12 @@ public class BeachResortManagementGUI extends JFrame {
 
     private void deleteAmenity(JTable table, DefaultTableModel model) {
         int row = table.getSelectedRow();
-        if (row == -1) return;
+
+        // no row selected
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an amenity to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         Long id = (Long) model.getValueAt(row, 0);
         String name = (String) model.getValueAt(row, 1);
@@ -1336,7 +1341,12 @@ public class BeachResortManagementGUI extends JFrame {
 
     private void deleteInventoryItem(JTable table, DefaultTableModel model) {
         int row = table.getSelectedRow();
-        if (row == -1) return;
+
+        // no row selected
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an inventory item to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         Long id = (Long) model.getValueAt(row, 0);
         String name = (String) model.getValueAt(row, 1);
