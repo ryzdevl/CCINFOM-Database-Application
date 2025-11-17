@@ -506,34 +506,36 @@ public class BeachResortManagementGUI extends JFrame {
         inputPanel.add(firstNameField);
         inputPanel.add(new JLabel("Last Name:"));
         inputPanel.add(lastNameField);
-        inputPanel.add(new JLabel("Phone:"));
+        inputPanel.add(new JLabel("Phone (Optiona):"));
         inputPanel.add(phoneField);
-        inputPanel.add(new JLabel("Email:"));
+        inputPanel.add(new JLabel("Email (Optional):"));
         inputPanel.add(emailField);
-        inputPanel.add(new JLabel("Passport No:"));
+        inputPanel.add(new JLabel("Passport No (Optional):"));
         inputPanel.add(passportField);
 
         int result = JOptionPane.showConfirmDialog(this, inputPanel,
                 "Add New Guest", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (result == JOptionPane.OK_OPTION) {
-            try {
-                Guest guest = new Guest(
-                        firstNameField.getText().trim(),
-                        lastNameField.getText().trim(),
-                        phoneField.getText().trim(),
-                        emailField.getText().trim(),
-                        passportField.getText().trim()
-                );
+         String firstName = firstNameField.getText().trim();
+         String lastName = lastNameField.getText().trim();
+         String phone = phoneField.getText().trim();
+         String email = emailField.getText().trim();
+         String passport = passportField.getText().trim();
 
-                Long id = guestDAO.addGuest(guest);
-                JOptionPane.showMessageDialog(this,
-                        "Guest added successfully with ID: " + id,
-                        "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadGuestData(model);
-            } catch (SQLException e) {
-                showError("Error adding guest: " + e.getMessage());
-            }
+         if(firstName.isEmpty() || lastName.isEmpty()) {
+            showError("First Name and Last Name are both required.");
+            return;
+         }
+
+         try {
+            Guest guest = new Guest(firstName, lastName, phone, email, passport);
+            Long id = guestDAO.addGuest(guest);
+            JOptionPane.showMessageDialog(this, "Guest Added Successfully with ID: " + id, "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadGuestData(model);
+         } catch (SQLException e) {
+            showError("Error adding guest: " + e.getMessage());
+         }
         }
     }
 
@@ -565,26 +567,36 @@ public class BeachResortManagementGUI extends JFrame {
             inputPanel.add(firstNameField);
             inputPanel.add(new JLabel("Last Name:"));
             inputPanel.add(lastNameField);
-            inputPanel.add(new JLabel("Phone:"));
+            inputPanel.add(new JLabel("Phone (Optional):"));
             inputPanel.add(phoneField);
-            inputPanel.add(new JLabel("Email:"));
+            inputPanel.add(new JLabel("Email (Optional):"));
             inputPanel.add(emailField);
-            inputPanel.add(new JLabel("Passport No:"));
+            inputPanel.add(new JLabel("Passport No (Optional):"));
             inputPanel.add(passportField);
 
             int result = JOptionPane.showConfirmDialog(this, inputPanel,
                     "Edit Guest", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
             if (result == JOptionPane.OK_OPTION) {
-                guest.setFirstName(firstNameField.getText().trim());
-                guest.setLastName(lastNameField.getText().trim());
-                guest.setPhone(phoneField.getText().trim());
-                guest.setEmail(emailField.getText().trim());
-                guest.setPassportNo(passportField.getText().trim());
+                String firstName = firstNameField.getText().trim();
+                String lastName = lastNameField.getText().trim();
+                String phone = phoneField.getText().trim();
+                String email = emailField.getText().trim();
+                String passport = passportField.getText().trim();
+
+                if(firstName.isEmpty() || lastName.isEmpty()) {
+                    showError("First Name and Last Name are required.");
+                    return;
+                }
+
+                guest.setFirstName(firstName);
+                guest.setLastName(lastName);
+                guest.setPhone(phone);
+                guest.setEmail(email);
+                guest.setPassportNo(passport);
 
                 guestDAO.updateGuest(guest);
-                JOptionPane.showMessageDialog(this, "Guest updated successfully!",
-                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Guest updated Successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 loadGuestData(model);
             }
         } catch (SQLException e) {
@@ -801,24 +813,46 @@ public class BeachResortManagementGUI extends JFrame {
         int result = JOptionPane.showConfirmDialog(this, inputPanel, "Add New Room", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
-            try {
-                Room room = new Room(
-                        roomCodeField.getText().trim(),
-                        (String) roomTypeCombo.getSelectedItem(),
-                        (String) bedTypeCombo.getSelectedItem(),
-                        (Integer) capacitySpinner.getValue(),
-                        Double.parseDouble(rateField.getText().trim())
-                );
-                room.setDescription(descArea.getText().trim());
+           String roomCode = roomCodeField.getText().trim();
+           String roomType = (String) roomTypeCombo.getSelectedItem();
+           String bedType  = (String) bedTypeCombo.getSelectedItem();
+           int maxCap      = (Integer) capacitySpinner.getValue();
+           String rateText = rateField.getText().trim();
+           String desc = descArea.getText().trim();
 
-                Long id = roomDAO.addRoom(room);
-                JOptionPane.showMessageDialog(this, "Room added successfully with ID: " + id, "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadRoomData(model);
-            } catch (SQLException e) {
-                showError("Error adding room: " + e.getMessage());
-            } catch (NumberFormatException e) {
-                showError("Invalid rate format. Please enter a valid number.");
-            }
+           if(roomCode.isEmpty()) {
+            showError("Room Code is required!");
+            return;
+           }
+           if(roomType == null || roomType.trim().isEmpty()) {
+            showError("Room Type is Required!");
+            return;
+           }
+           if(maxCap <= 0) {
+            showError("Max Capacity must be atleast 1.");
+            return;
+           }
+           double rate;
+           try {
+            rate = Double.parseDouble(rateText);
+           } catch (NumberFormatException ex) {
+            showError("Invalid rate format. Please enter a valid number.");
+            return;
+           }
+           if(rate <= 0) {
+            showError("Rate per night must be greater than 0.");
+            return;
+           }
+           try {
+            Room room = new Room(roomCode, roomType, bedType, maxCap, rate);
+            room.setDescription(desc);
+
+            long id = roomDAO.addRoom(room);
+            JOptionPane.showMessageDialog(this, "Room added successfully with ID: " + id, "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadRoomData(model);
+           } catch (SQLException e) {
+            showError("Error adding room: " + e.getMessage());
+           }
         }
     }
 
@@ -865,20 +899,56 @@ public class BeachResortManagementGUI extends JFrame {
             int result = JOptionPane.showConfirmDialog(this, inputPanel, "Edit Room", JOptionPane.OK_CANCEL_OPTION);
 
             if (result == JOptionPane.OK_OPTION) {
-                room.setRoomCode(roomCodeField.getText().trim());
-                room.setRoomType((String) roomTypeCombo.getSelectedItem());
-                room.setBedType((String) bedTypeCombo.getSelectedItem());
-                room.setMaxCapacity((Integer) capacitySpinner.getValue());
-                room.setRatePerNight(Double.parseDouble(rateField.getText().trim()));
-                room.setStatus((String) statusCombo.getSelectedItem());
+            String roomCode = roomCodeField.getText().trim();
+            String roomType = (String) roomTypeCombo.getSelectedItem();
+            String bedType  = (String) bedTypeCombo.getSelectedItem();
+            int maxCap      = (Integer) capacitySpinner.getValue();
+            String rateText = rateField.getText().trim();
+            String status   = (String) statusCombo.getSelectedItem();
 
-                roomDAO.updateRoom(room);
-                JOptionPane.showMessageDialog(this, "Room updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadRoomData(model);
+            if (roomCode.isEmpty()) {
+                showError("Room Code is required.");
+                return;
             }
-        } catch (SQLException e) {
-            showError("Error updating room: " + e.getMessage());
+            if (roomType == null || roomType.trim().isEmpty()) {
+                showError("Room Type is required.");
+                return;
+            }
+            if (status == null || status.trim().isEmpty()) {
+                showError("Status is required.");
+                return;
+            }
+            if (maxCap <= 0) {
+                showError("Max Capacity must be at least 1.");
+                return;
+            }
+
+            double rate;
+            try {
+                rate = Double.parseDouble(rateText);
+            } catch (NumberFormatException ex) {
+                showError("Invalid rate format. Please enter a valid number.");
+                return;
+            }
+            if (rate <= 0) {
+                showError("Rate per night must be greater than 0.");
+                return;
+            }
+
+            room.setRoomCode(roomCode);
+            room.setRoomType(roomType);
+            room.setBedType(bedType);
+            room.setMaxCapacity(maxCap);
+            room.setRatePerNight(rate);
+            room.setStatus(status);
+
+            roomDAO.updateRoom(room);
+            JOptionPane.showMessageDialog(this, "Room updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadRoomData(model);
         }
+    } catch (SQLException e) {
+        showError("Error updating room: " + e.getMessage());
+    }
     }
 
     private void deleteRoom(JTable table, DefaultTableModel model) {
@@ -3419,4 +3489,3 @@ public class BeachResortManagementGUI extends JFrame {
         });
     }
 }
-
