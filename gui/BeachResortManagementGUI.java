@@ -2704,7 +2704,14 @@ public class BeachResortManagementGUI extends JFrame {
                 data[i][2] = items.get(i).getQuantityOnHand();
             }
 
-            table.setModel(new DefaultTableModel(data, cols));
+            // make table uneditable
+            DefaultTableModel model = new DefaultTableModel(data, cols) {
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+
+            table.setModel(model);
         } catch (Exception e) {
             e.printStackTrace();
         }
