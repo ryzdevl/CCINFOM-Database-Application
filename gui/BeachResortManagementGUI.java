@@ -783,47 +783,64 @@ public class BeachResortManagementGUI extends JFrame {
         }
     }
 
+    //helper to generate room code based on the type and the timestamp
+    //time stamp is used at the end of the code to make the code unique.
+    private String generateRoomCode(String roomType) {
+        String prefix;
+        if (roomType == null) {
+                prefix = "RM";
+       }else {
+            switch (roomType.toLowerCase()) {
+                case "standard" -> prefix = "STD";
+                case "deluxe"   -> prefix = "DLX";
+                case "suite"    -> prefix = "STE";
+                case "cottage"  -> prefix = "COT";
+                default         -> prefix = "RM";
+            }
+        }
+        // Use last digits of current time to keep it "unique enough"
+        long suffix = System.currentTimeMillis() % 1_000_000;
+        return prefix + "-" + suffix;
+    }    
+    
     private void addRoom(DefaultTableModel model) {
         if (roomDAO == null) {
             JOptionPane.showMessageDialog(this, "Database connection not ready.", "Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        JTextField roomCodeField = new JTextField(20);
+        //removed room code field *it was here before*
         JComboBox<String> roomTypeCombo = new JComboBox<>(new String[]{"Standard", "Deluxe", "Suite", "Cottage"});
         JComboBox<String> bedTypeCombo = new JComboBox<>(new String[]{"Single", "Twin", "Queen", "King"});
         JSpinner capacitySpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
         JTextField rateField = new JTextField(20);
         JTextArea descArea = new JTextArea(3, 20);
 
-        JPanel inputPanel = new JPanel(new GridLayout(6, 2, 10, 10));
-        inputPanel.add(new JLabel("Room Code:"));
-        inputPanel.add(roomCodeField);
+        JPanel inputPanel = new JPanel(new GridLayout(5, 2, 10, 10)); //changed rows from 6 to 5 because we removed roomcode input
+        //removed roomcode field it was here before
+        //and here
         inputPanel.add(new JLabel("Room Type:"));
         inputPanel.add(roomTypeCombo);
-        inputPanel.add(new JLabel("Bed Type:"));
+        inputPanel.add(new JLabel("Bed Type (Optional):"));
         inputPanel.add(bedTypeCombo);
         inputPanel.add(new JLabel("Max Capacity:"));
         inputPanel.add(capacitySpinner);
         inputPanel.add(new JLabel("Rate per Night:"));
         inputPanel.add(rateField);
-        inputPanel.add(new JLabel("Description:"));
+        inputPanel.add(new JLabel("Description (Optional):"));
         inputPanel.add(new JScrollPane(descArea));
 
         int result = JOptionPane.showConfirmDialog(this, inputPanel, "Add New Room", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
-           String roomCode = roomCodeField.getText().trim();
+           //removed string roomcode
            String roomType = (String) roomTypeCombo.getSelectedItem();
            String bedType  = (String) bedTypeCombo.getSelectedItem();
            int maxCap      = (Integer) capacitySpinner.getValue();
            String rateText = rateField.getText().trim();
            String desc = descArea.getText().trim();
 
-           if(roomCode.isEmpty()) {
-            showError("Room Code is required!");
-            return;
-           }
+          //removed if room code is empty (it was here before)
            if(roomType == null || roomType.trim().isEmpty()) {
             showError("Room Type is Required!");
             return;
@@ -843,12 +860,14 @@ public class BeachResortManagementGUI extends JFrame {
             showError("Rate per night must be greater than 0.");
             return;
            }
+           //auto generate the room code
+           String roomCode = generateRoomCode(roomType);
            try {
             Room room = new Room(roomCode, roomType, bedType, maxCap, rate);
             room.setDescription(desc);
 
             long id = roomDAO.addRoom(room);
-            JOptionPane.showMessageDialog(this, "Room added successfully with ID: " + id, "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Room added successfully with ID: " + id + "\n Generated Room Code: " +roomCode, "Success", JOptionPane.INFORMATION_MESSAGE);
             loadRoomData(model);
            } catch (SQLException e) {
             showError("Error adding room: " + e.getMessage());
@@ -871,8 +890,9 @@ public class BeachResortManagementGUI extends JFrame {
                 showError("Room not found!");
                 return;
             }
-
-            JTextField roomCodeField = new JTextField(room.getRoomCode(), 20);
+            //show room code as read only
+            JLabel roomCodeLabel = new JLabel(room.getRoomCode());
+            //removed roomcodefield
             JComboBox<String> roomTypeCombo = new JComboBox<>(new String[]{"Standard", "Deluxe", "Suite", "Cottage"});
             roomTypeCombo.setSelectedItem(room.getRoomType());
             JComboBox<String> bedTypeCombo = new JComboBox<>(new String[]{"Single", "Twin", "Queen", "King"});
@@ -883,11 +903,11 @@ public class BeachResortManagementGUI extends JFrame {
             statusCombo.setSelectedItem(room.getStatus());
 
             JPanel inputPanel = new JPanel(new GridLayout(6, 2, 10, 10));
-            inputPanel.add(new JLabel("Room Code:"));
-            inputPanel.add(roomCodeField);
+            inputPanel.add(new JLabel("Room Code:")); //read-only display
+            inputPanel.add(roomCodeLabel); //changed from field to label.
             inputPanel.add(new JLabel("Room Type:"));
             inputPanel.add(roomTypeCombo);
-            inputPanel.add(new JLabel("Bed Type:"));
+            inputPanel.add(new JLabel("Bed Type (Optional):"));
             inputPanel.add(bedTypeCombo);
             inputPanel.add(new JLabel("Max Capacity:"));
             inputPanel.add(capacitySpinner);
@@ -899,17 +919,14 @@ public class BeachResortManagementGUI extends JFrame {
             int result = JOptionPane.showConfirmDialog(this, inputPanel, "Edit Room", JOptionPane.OK_CANCEL_OPTION);
 
             if (result == JOptionPane.OK_OPTION) {
-            String roomCode = roomCodeField.getText().trim();
+            //removed roomcode
             String roomType = (String) roomTypeCombo.getSelectedItem();
             String bedType  = (String) bedTypeCombo.getSelectedItem();
             int maxCap      = (Integer) capacitySpinner.getValue();
             String rateText = rateField.getText().trim();
             String status   = (String) statusCombo.getSelectedItem();
 
-            if (roomCode.isEmpty()) {
-                showError("Room Code is required.");
-                return;
-            }
+           //removed if room code
             if (roomType == null || roomType.trim().isEmpty()) {
                 showError("Room Type is required.");
                 return;
@@ -935,7 +952,7 @@ public class BeachResortManagementGUI extends JFrame {
                 return;
             }
 
-            room.setRoomCode(roomCode);
+            //removed set roomcode
             room.setRoomType(roomType);
             room.setBedType(bedType);
             room.setMaxCapacity(maxCap);
