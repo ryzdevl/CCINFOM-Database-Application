@@ -1385,7 +1385,7 @@ public class BeachResortManagementGUI extends JFrame {
 
         // Guest info display
         gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 3;
-        guestInfoLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
+        guestInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         guestInfoLabel.setForeground(SUCCESS_COLOR);
         formPanel.add(guestInfoLabel, gbc);
 
@@ -1408,23 +1408,92 @@ public class BeachResortManagementGUI extends JFrame {
         roomInfoLabel.setForeground(SUCCESS_COLOR);
         formPanel.add(roomInfoLabel, gbc);
 
-        // Check-in Date
+        // Check-in Date with Dropdowns
         gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Check-In Date (YYYY-MM-DD):"), gbc);
+        formPanel.add(new JLabel("Check-In Date:"), gbc);
 
         gbc.gridx = 1; gbc.gridwidth = 2;
-        JTextField checkInField = new JTextField(15);
-        checkInField.setText(LocalDate.now().toString());
-        formPanel.add(checkInField, gbc);
+        JPanel checkInPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        checkInPanel.setOpaque(false);
 
-        // Check-out Date
+        // Year dropdown for check-in
+        JComboBox<Integer> checkInYearCombo = new JComboBox<>();
+        int currentYear = LocalDate.now().getYear();
+        for (int i = currentYear; i <= currentYear + 2; i++) {
+            checkInYearCombo.addItem(i);
+        }
+
+        // Month dropdown for check-in
+        String[] months = {"January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"};
+        JComboBox<String> checkInMonthCombo = new JComboBox<>(months);
+        checkInMonthCombo.setSelectedIndex(LocalDate.now().getMonthValue() - 1);
+
+        // Day dropdown for check-in
+        JComboBox<Integer> checkInDayCombo = new JComboBox<>();
+        updateDayCombo(checkInDayCombo, (Integer)checkInYearCombo.getSelectedItem(),
+                checkInMonthCombo.getSelectedIndex() + 1);
+        checkInDayCombo.setSelectedItem(LocalDate.now().getDayOfMonth());
+
+        checkInPanel.add(new JLabel("Year:"));
+        checkInPanel.add(checkInYearCombo);
+        checkInPanel.add(new JLabel("Month:"));
+        checkInPanel.add(checkInMonthCombo);
+        checkInPanel.add(new JLabel("Day:"));
+        checkInPanel.add(checkInDayCombo);
+
+        formPanel.add(checkInPanel, gbc);
+
+        // Check-out Date with Dropdowns
         gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Check-Out Date (YYYY-MM-DD):"), gbc);
+        formPanel.add(new JLabel("Check-Out Date:"), gbc);
 
         gbc.gridx = 1; gbc.gridwidth = 2;
-        JTextField checkOutField = new JTextField(15);
-        checkOutField.setText(LocalDate.now().plusDays(3).toString());
-        formPanel.add(checkOutField, gbc);
+        JPanel checkOutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        checkOutPanel.setOpaque(false);
+
+        // Year dropdown for check-out
+        JComboBox<Integer> checkOutYearCombo = new JComboBox<>();
+        for (int i = currentYear; i <= currentYear + 2; i++) {
+            checkOutYearCombo.addItem(i);
+        }
+
+        // Month dropdown for check-out
+        JComboBox<String> checkOutMonthCombo = new JComboBox<>(months);
+        LocalDate defaultCheckOut = LocalDate.now().plusDays(3);
+        checkOutMonthCombo.setSelectedIndex(defaultCheckOut.getMonthValue() - 1);
+
+        // Day dropdown for check-out
+        JComboBox<Integer> checkOutDayCombo = new JComboBox<>();
+        updateDayCombo(checkOutDayCombo, (Integer)checkOutYearCombo.getSelectedItem(),
+                checkOutMonthCombo.getSelectedIndex() + 1);
+        checkOutDayCombo.setSelectedItem(defaultCheckOut.getDayOfMonth());
+
+        checkOutPanel.add(new JLabel("Year:"));
+        checkOutPanel.add(checkOutYearCombo);
+        checkOutPanel.add(new JLabel("Month:"));
+        checkOutPanel.add(checkOutMonthCombo);
+        checkOutPanel.add(new JLabel("Day:"));
+        checkOutPanel.add(checkOutDayCombo);
+
+        formPanel.add(checkOutPanel, gbc);
+
+        // Update day combos when year or month changes
+        checkInYearCombo.addActionListener(e -> updateDayCombo(checkInDayCombo,
+                (Integer)checkInYearCombo.getSelectedItem(),
+                checkInMonthCombo.getSelectedIndex() + 1));
+
+        checkInMonthCombo.addActionListener(e -> updateDayCombo(checkInDayCombo,
+                (Integer)checkInYearCombo.getSelectedItem(),
+                checkInMonthCombo.getSelectedIndex() + 1));
+
+        checkOutYearCombo.addActionListener(e -> updateDayCombo(checkOutDayCombo,
+                (Integer)checkOutYearCombo.getSelectedItem(),
+                checkOutMonthCombo.getSelectedIndex() + 1));
+
+        checkOutMonthCombo.addActionListener(e -> updateDayCombo(checkOutDayCombo,
+                (Integer)checkOutYearCombo.getSelectedItem(),
+                checkOutMonthCombo.getSelectedIndex() + 1));
 
         // Booking Channel
         gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 1;
@@ -1432,7 +1501,7 @@ public class BeachResortManagementGUI extends JFrame {
 
         gbc.gridx = 1; gbc.gridwidth = 2;
         JComboBox<String> channelCombo = new JComboBox<>(new String[]{"Walk-In", "Online", "Phone", "Agent"});
-        channelCombo.setSelectedIndex(1); // Default to online
+        channelCombo.setSelectedIndex(1);
         formPanel.add(channelCombo, gbc);
 
         // Amenities selection
@@ -1445,7 +1514,6 @@ public class BeachResortManagementGUI extends JFrame {
         JPanel amenityPanel = new JPanel(new GridLayout(0, 2, 10, 5));
         amenityPanel.setOpaque(false);
 
-        // Load amenities dynamically
         JCheckBox[] amenityCheckboxes = new JCheckBox[8];
         JButton loadAmenitiesBtn = createActionButton("Load Available Amenities", SECONDARY_COLOR);
         loadAmenitiesBtn.addActionListener(e -> loadAmenitiesForBooking(amenityPanel, amenityCheckboxes));
@@ -1455,8 +1523,9 @@ public class BeachResortManagementGUI extends JFrame {
         formPanel.add(amenityPanel, gbc);
 
         // Availability check button action
-        checkAvailBtn.addActionListener(e -> checkRoomAvailability(
-                roomIdField, checkInField, checkOutField, roomInfoLabel
+        checkAvailBtn.addActionListener(e -> checkRoomAvailabilityWithDropdowns(
+                roomIdField, checkInYearCombo, checkInMonthCombo, checkInDayCombo,
+                checkOutYearCombo, checkOutMonthCombo, checkOutDayCombo, roomInfoLabel
         ));
 
         panel.add(formPanel, BorderLayout.CENTER);
@@ -1466,9 +1535,11 @@ public class BeachResortManagementGUI extends JFrame {
         actionPanel.setOpaque(false);
 
         JButton bookBtn = createActionButton("✅ Create Reservation", SUCCESS_COLOR);
-        bookBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
-        bookBtn.addActionListener(e -> createReservation(
-                guestIdField, roomIdField, checkInField, checkOutField,
+        bookBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        bookBtn.addActionListener(e -> createReservationWithDropdowns(
+                guestIdField, roomIdField,
+                checkInYearCombo, checkInMonthCombo, checkInDayCombo,
+                checkOutYearCombo, checkOutMonthCombo, checkOutDayCombo,
                 channelCombo, amenityCheckboxes
         ));
 
@@ -1476,11 +1547,22 @@ public class BeachResortManagementGUI extends JFrame {
         clearBtn.addActionListener(e -> {
             guestIdField.setText("");
             roomIdField.setText("");
-            checkInField.setText(LocalDate.now().toString());
-            checkOutField.setText(LocalDate.now().plusDays(3).toString());
             guestInfoLabel.setText("");
             roomInfoLabel.setText("");
             channelCombo.setSelectedIndex(1);
+
+            // Reset to current date
+            LocalDate now = LocalDate.now();
+            checkInYearCombo.setSelectedItem(now.getYear());
+            checkInMonthCombo.setSelectedIndex(now.getMonthValue() - 1);
+            checkInDayCombo.setSelectedItem(now.getDayOfMonth());
+
+            // Reset to 3 days from now
+            LocalDate future = now.plusDays(3);
+            checkOutYearCombo.setSelectedItem(future.getYear());
+            checkOutMonthCombo.setSelectedIndex(future.getMonthValue() - 1);
+            checkOutDayCombo.setSelectedItem(future.getDayOfMonth());
+
             for (JCheckBox cb : amenityCheckboxes) {
                 if (cb != null) cb.setSelected(false);
             }
@@ -1492,6 +1574,226 @@ public class BeachResortManagementGUI extends JFrame {
         panel.add(actionPanel, BorderLayout.SOUTH);
 
         return panel;
+    }
+
+    // Helper method to update day combo based on selected year and month
+    private void updateDayCombo(JComboBox<Integer> dayCombo, int year, int month) {
+        int currentSelection = dayCombo.getSelectedItem() != null ? (Integer)dayCombo.getSelectedItem() : 1;
+        dayCombo.removeAllItems();
+
+        // Get number of days in the month
+        int daysInMonth = java.time.YearMonth.of(year, month).lengthOfMonth();
+
+        for (int i = 1; i <= daysInMonth; i++) {
+            dayCombo.addItem(i);
+        }
+
+        // Restore previous selection if valid
+        if (currentSelection <= daysInMonth) {
+            dayCombo.setSelectedItem(currentSelection);
+        } else {
+            dayCombo.setSelectedItem(daysInMonth);
+        }
+    }
+
+    // Helper method to get LocalDate from dropdowns
+    private LocalDate getDateFromDropdowns(JComboBox<Integer> yearCombo,
+                                           JComboBox<String> monthCombo,
+                                           JComboBox<Integer> dayCombo) {
+        int year = (Integer) yearCombo.getSelectedItem();
+        int month = monthCombo.getSelectedIndex() + 1;
+        int day = (Integer) dayCombo.getSelectedItem();
+        return LocalDate.of(year, month, day);
+    }
+
+    // Updated checkRoomAvailability method for dropdowns
+    private void checkRoomAvailabilityWithDropdowns(JTextField roomIdField,
+                                                    JComboBox<Integer> checkInYearCombo,
+                                                    JComboBox<String> checkInMonthCombo,
+                                                    JComboBox<Integer> checkInDayCombo,
+                                                    JComboBox<Integer> checkOutYearCombo,
+                                                    JComboBox<String> checkOutMonthCombo,
+                                                    JComboBox<Integer> checkOutDayCombo,
+                                                    JLabel roomInfoLabel) {
+        try {
+            if (roomDAO == null) {
+                showError("Database not connected");
+                return;
+            }
+
+            String roomIdText = roomIdField.getText().trim();
+            if (roomIdText.isEmpty()) {
+                showError("Please enter a Room ID");
+                return;
+            }
+
+            Long roomId = Long.parseLong(roomIdText);
+            Room room = roomDAO.getRoomById(roomId);
+
+            if (room == null) {
+                roomInfoLabel.setText("Room not found");
+                roomInfoLabel.setForeground(DANGER_COLOR);
+                showError("Room with ID " + roomId + " not found!");
+                return;
+            }
+
+            // Get dates from dropdowns
+            LocalDate checkIn = getDateFromDropdowns(checkInYearCombo, checkInMonthCombo, checkInDayCombo);
+            LocalDate checkOut = getDateFromDropdowns(checkOutYearCombo, checkOutMonthCombo, checkOutDayCombo);
+
+            // Validate dates
+            if (checkOut.isBefore(checkIn) || checkOut.isEqual(checkIn)) {
+                showError("Check-out date must be after check-in date!");
+                return;
+            }
+
+            // Check availability
+            boolean isAvailable = roomDAO.isRoomAvailable(roomId, checkIn, checkOut);
+
+            if (isAvailable) {
+                long nights = java.time.temporal.ChronoUnit.DAYS.between(checkIn, checkOut);
+                double totalCost = nights * room.getRatePerNight();
+
+                roomInfoLabel.setText(String.format(
+                        "✓ %s (%s) - ₱%.2f/night - Available for %d nights - Total: ₱%.2f",
+                        room.getRoomCode(), room.getRoomType(), room.getRatePerNight(), nights, totalCost
+                ));
+                roomInfoLabel.setForeground(SUCCESS_COLOR);
+                updateStatus("Room available for selected dates");
+            } else {
+                roomInfoLabel.setText("✗ Room NOT available for selected dates");
+                roomInfoLabel.setForeground(DANGER_COLOR);
+                showError("Room is not available for the selected dates. Please choose different dates.");
+            }
+
+        } catch (NumberFormatException e) {
+            showError("Invalid Room ID format. Please enter a number.");
+        } catch (Exception e) {
+            showError("Error checking availability: " + e.getMessage());
+        }
+    }
+
+    // Updated createReservation method for dropdowns
+    private void createReservationWithDropdowns(JTextField guestIdField, JTextField roomIdField,
+                                                JComboBox<Integer> checkInYearCombo,
+                                                JComboBox<String> checkInMonthCombo,
+                                                JComboBox<Integer> checkInDayCombo,
+                                                JComboBox<Integer> checkOutYearCombo,
+                                                JComboBox<String> checkOutMonthCombo,
+                                                JComboBox<Integer> checkOutDayCombo,
+                                                JComboBox<String> channelCombo,
+                                                JCheckBox[] amenityCheckboxes) {
+        try {
+            if (reservationDAO == null) {
+                showError("Database not connected");
+                return;
+            }
+
+            // Validate inputs
+            if (guestIdField.getText().trim().isEmpty() || roomIdField.getText().trim().isEmpty()) {
+                showError("Please fill in Guest ID and Room ID");
+                return;
+            }
+
+            // Parse data
+            Long guestId = Long.parseLong(guestIdField.getText().trim());
+            Long roomId = Long.parseLong(roomIdField.getText().trim());
+
+            // Get dates from dropdowns
+            LocalDate checkIn = getDateFromDropdowns(checkInYearCombo, checkInMonthCombo, checkInDayCombo);
+            LocalDate checkOut = getDateFromDropdowns(checkOutYearCombo, checkOutMonthCombo, checkOutDayCombo);
+
+            String bookingChannel = (String) channelCombo.getSelectedItem();
+
+            // Validate dates
+            if (checkOut.isBefore(checkIn) || checkOut.isEqual(checkIn)) {
+                showError("Check-out date must be after check-in date!");
+                return;
+            }
+
+            if (checkIn.isBefore(LocalDate.now())) {
+                showError("Check-in date cannot be in the past!");
+                return;
+            }
+
+            // Collect selected amenities
+            List<Long> selectedAmenities = new ArrayList<>();
+            for (JCheckBox cb : amenityCheckboxes) {
+                if (cb != null && cb.isSelected()) {
+                    Long amenityId = (Long) cb.getClientProperty("amenityId");
+                    if (amenityId != null) {
+                        selectedAmenities.add(amenityId);
+                    }
+                }
+            }
+
+            // Create reservation object
+            Reservation reservation = new Reservation(guestId, roomId, checkIn, checkOut, bookingChannel);
+
+            // Confirm before creating
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    String.format("Create reservation:\n\n" +
+                                    "Guest ID: %d\n" +
+                                    "Room ID: %d\n" +
+                                    "Check-In: %s\n" +
+                                    "Check-Out: %s\n" +
+                                    "Channel: %s\n" +
+                                    "Amenities: %d selected\n\n" +
+                                    "Proceed?",
+                            guestId, roomId, checkIn, checkOut, bookingChannel, selectedAmenities.size()),
+                    "Confirm Reservation",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            // Call DAO to create reservation (with transaction)
+            Long reservationId = reservationDAO.createReservation(reservation, selectedAmenities);
+
+            // Success message
+            JOptionPane.showMessageDialog(this,
+                    String.format("Reservation created successfully!\n\n" +
+                                    "Reservation ID: %d\n" +
+                                    "Status: Confirmed\n\n" +
+                                    "The room status has been updated to 'reserved'.\n" +
+                                    "Selected amenities have been linked to the reservation.",
+                            reservationId),
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            updateStatus("Reservation #" + reservationId + " created successfully");
+
+            // Clear form
+            guestIdField.setText("");
+            roomIdField.setText("");
+            channelCombo.setSelectedIndex(1);
+
+            // Reset dates to defaults
+            LocalDate now = LocalDate.now();
+            checkInYearCombo.setSelectedItem(now.getYear());
+            checkInMonthCombo.setSelectedIndex(now.getMonthValue() - 1);
+            checkInDayCombo.setSelectedItem(now.getDayOfMonth());
+
+            LocalDate future = now.plusDays(3);
+            checkOutYearCombo.setSelectedItem(future.getYear());
+            checkOutMonthCombo.setSelectedIndex(future.getMonthValue() - 1);
+            checkOutDayCombo.setSelectedItem(future.getDayOfMonth());
+
+            for (JCheckBox cb : amenityCheckboxes) {
+                if (cb != null) cb.setSelected(false);
+            }
+
+        } catch (NumberFormatException e) {
+            showError("Invalid ID format. Please enter valid numbers for Guest ID and Room ID.");
+        } catch (SQLException e) {
+            showError("Error creating reservation: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            showError("Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void searchGuest(JTextField guestIdField, JLabel guestInfoLabel) {
@@ -2168,7 +2470,7 @@ public class BeachResortManagementGUI extends JFrame {
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        RestockDAO restockDAO = new RestockDAO();  
+        RestockDAO restockDAO = new RestockDAO();
         InventoryDAO inventoryDAO = new InventoryDAO();
 
         // ---------- HEADER ----------
@@ -2374,38 +2676,456 @@ public class BeachResortManagementGUI extends JFrame {
         }
     }
 
-    // AMENITY RENTAL - Placeholder
+    // AMENITY RENTAL - Assigned to Daniel Pamintuan
     private JPanel createAmenityRentalPanel() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        JPanel panel = new JPanel(new BorderLayout(15, 15));
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         // Header
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setOpaque(false);
-
         JLabel titleLabel = new JLabel("Amenity Rental");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
 
-        JLabel assignLabel = new JLabel("Assigned to: Ryan James Malapitan");
+        JLabel assignLabel = new JLabel("Assigned to: Daniel Pamintuan");
         assignLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         assignLabel.setForeground(new Color(127, 140, 141));
 
-        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
-        titlePanel.setOpaque(false);
-        titlePanel.add(titleLabel);
-        titlePanel.add(assignLabel);
+        JPanel headerPanel = new JPanel(new GridLayout(2, 1));
+        headerPanel.setOpaque(false);
+        headerPanel.add(titleLabel);
+        headerPanel.add(assignLabel);
 
-        headerPanel.add(titlePanel, BorderLayout.WEST);
         panel.add(headerPanel, BorderLayout.NORTH);
 
-        JLabel infoLabel = new JLabel("<html><center>Implement amenity rental transaction<br>" +
-                "Use AmenityRentalDAO.processAmenityRental() method</center></html>");
-        infoLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
-        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(infoLabel, BorderLayout.CENTER);
+        // Form panel
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(Color.WHITE);
+        formPanel.setBorder(new CompoundBorder(
+                new LineBorder(new Color(189, 195, 199), 1),
+                new EmptyBorder(20, 20, 20, 20)
+        ));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        // Guest ID field with search
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Guest ID:"), gbc);
+
+        gbc.gridx = 1;
+        JTextField guestIdField = new JTextField(15);
+        formPanel.add(guestIdField, gbc);
+
+        gbc.gridx = 2;
+        JButton searchGuestBtn = createActionButton("🔍 Search Guest", PRIMARY_COLOR);
+        formPanel.add(searchGuestBtn, gbc);
+
+        // Guest info display
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 3;
+        JLabel guestInfoLabel = new JLabel("");
+        guestInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        guestInfoLabel.setForeground(SUCCESS_COLOR);
+        formPanel.add(guestInfoLabel, gbc);
+
+        // Reservation combo box
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Select Reservation:"), gbc);
+
+        gbc.gridx = 1; gbc.gridwidth = 2;
+        JComboBox<Reservation> reservationCombo = new JComboBox<>();
+        reservationCombo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Reservation res) {
+                    setText("ID: " + res.getReservationId() + " | Room: " + res.getRoomId() + " | Status: " + res.getStatus());
+                }
+                return this;
+            }
+        });
+        formPanel.add(reservationCombo, gbc);
+
+        // Reservation info display
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 3;
+        JLabel reservationInfoLabel = new JLabel("");
+        reservationInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        reservationInfoLabel.setForeground(SUCCESS_COLOR);
+        formPanel.add(reservationInfoLabel, gbc);
+
+        // Amenity selection
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Select Amenity:"), gbc);
+
+        gbc.gridx = 1; gbc.gridwidth = 2;
+        JComboBox<Amenity> amenityCombo = new JComboBox<>();
+        amenityCombo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Amenity amenity) {
+                    setText(String.format("%s - ₱%.2f (Status: %s)",
+                            amenity.getName(), amenity.getRate(), amenity.getAvailability()));
+                }
+                return this;
+            }
+        });
+        formPanel.add(amenityCombo, gbc);
+
+        // Load amenities button
+        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 3;
+        JButton loadAmenitiesBtn = createActionButton("🔄 Load Available Amenities", SECONDARY_COLOR);
+        formPanel.add(loadAmenitiesBtn, gbc);
+
+        // Amenity info display
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 3;
+        JLabel amenityInfoLabel = new JLabel("");
+        amenityInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        amenityInfoLabel.setForeground(SUCCESS_COLOR);
+        formPanel.add(amenityInfoLabel, gbc);
+
+        // Quantity
+        gbc.gridx = 0; gbc.gridy = 7; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Quantity:"), gbc);
+
+        gbc.gridx = 1; gbc.gridwidth = 2;
+        JSpinner quantitySpinner = new JSpinner(new SpinnerNumberModel(1, 1, 50, 1));
+        formPanel.add(quantitySpinner, gbc);
+
+        // Rental Start DateTime
+        gbc.gridx = 0; gbc.gridy = 8; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Rental Start (YYYY-MM-DD HH:MM):"), gbc);
+
+        gbc.gridx = 1; gbc.gridwidth = 2;
+        JTextField rentStartField = new JTextField(LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        formPanel.add(rentStartField, gbc);
+
+        // Rental End DateTime
+        gbc.gridx = 0; gbc.gridy = 9; gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Rental End (YYYY-MM-DD HH:MM):"), gbc);
+
+        gbc.gridx = 1; gbc.gridwidth = 2;
+        JTextField rentEndField = new JTextField(LocalDateTime.now().plusHours(4).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        formPanel.add(rentEndField, gbc);
+
+        // Active rentals display area
+        gbc.gridx = 0; gbc.gridy = 10; gbc.gridwidth = 3;
+        JLabel activeRentalsLabel = new JLabel("Active Rentals:");
+        activeRentalsLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        formPanel.add(activeRentalsLabel, gbc);
+
+        gbc.gridy = 11;
+        JTextArea activeRentalsArea = new JTextArea(5, 40);
+        activeRentalsArea.setEditable(false);
+        activeRentalsArea.setFont(new Font("Monospaced", Font.PLAIN, 11));
+        JScrollPane rentalsScrollPane = new JScrollPane(activeRentalsArea);
+        formPanel.add(rentalsScrollPane, gbc);
+
+        panel.add(formPanel, BorderLayout.CENTER);
+
+        // Button Actions
+
+        // Search Guest
+        searchGuestBtn.addActionListener(e -> {
+            try {
+                if (guestDAO == null || reservationDAO == null) {
+                    showError("Database not connected");
+                    return;
+                }
+
+                String guestIdText = guestIdField.getText().trim();
+                if (guestIdText.isEmpty()) {
+                    showError("Please enter a Guest ID");
+                    return;
+                }
+
+                Long guestId = Long.parseLong(guestIdText);
+                Guest guest = guestDAO.getGuestById(guestId);
+                reservationCombo.removeAllItems();
+                activeRentalsArea.setText("");
+
+                if (guest != null) {
+                    guestInfoLabel.setText("✓ Guest: " + guest.getFirstName() + " " + guest.getLastName() + " (" + guest.getEmail() + ")");
+                    guestInfoLabel.setForeground(SUCCESS_COLOR);
+
+                    // Load checked-in reservations
+                    List<Reservation> reservations = reservationDAO.getCheckedInReservationsByGuestId(guestId);
+                    if (reservations.isEmpty()) {
+                        reservationInfoLabel.setText("⚠ No checked-in reservations found. Guest must be checked-in to rent amenities.");
+                        reservationInfoLabel.setForeground(WARNING_COLOR);
+                    } else {
+                        for (Reservation res : reservations) {
+                            reservationCombo.addItem(res);
+                        }
+                        Reservation selected = (Reservation) reservationCombo.getSelectedItem();
+                        if (selected != null) {
+                            reservationInfoLabel.setText("✓ Reservation ID: " + selected.getReservationId() +
+                                    " | Room: " + selected.getRoomId() + " | Status: " + selected.getStatus());
+                            reservationInfoLabel.setForeground(SUCCESS_COLOR);
+                        }
+                    }
+
+                    // Load active rentals
+                    loadActiveRentals(guestId, activeRentalsArea);
+
+                } else {
+                    guestInfoLabel.setText("✗ Guest not found");
+                    guestInfoLabel.setForeground(DANGER_COLOR);
+                    reservationInfoLabel.setText("");
+                }
+
+            } catch (NumberFormatException ex) {
+                showError("Invalid Guest ID format. Please enter a number.");
+            } catch (Exception ex) {
+                showError("Error searching guest: " + ex.getMessage());
+            }
+        });
+
+        // Update reservation info when selection changes
+        reservationCombo.addActionListener(e -> {
+            Reservation selected = (Reservation) reservationCombo.getSelectedItem();
+            if (selected != null) {
+                reservationInfoLabel.setText("✓ Reservation ID: " + selected.getReservationId() +
+                        " | Room: " + selected.getRoomId() + " | Status: " + selected.getStatus());
+                reservationInfoLabel.setForeground(SUCCESS_COLOR);
+            }
+        });
+
+        // Load available amenities
+        loadAmenitiesBtn.addActionListener(e -> {
+            try {
+                if (amenityDAO == null) {
+                    showError("Database not connected");
+                    return;
+                }
+
+                amenityCombo.removeAllItems();
+                List<Amenity> amenities = amenityDAO.getAllAmenities("available");
+
+                if (amenities.isEmpty()) {
+                    amenityInfoLabel.setText("⚠ No available amenities found");
+                    amenityInfoLabel.setForeground(WARNING_COLOR);
+                } else {
+                    for (Amenity amenity : amenities) {
+                        amenityCombo.addItem(amenity);
+                    }
+                    Amenity selected = (Amenity) amenityCombo.getSelectedItem();
+                    if (selected != null) {
+                        amenityInfoLabel.setText(String.format("✓ %s - ₱%.2f per unit",
+                                selected.getName(), selected.getRate()));
+                        amenityInfoLabel.setForeground(SUCCESS_COLOR);
+                    }
+                    updateStatus("Loaded " + amenities.size() + " available amenities");
+                }
+
+            } catch (Exception ex) {
+                showError("Error loading amenities: " + ex.getMessage());
+            }
+        });
+
+        // Update amenity info when selection changes
+        amenityCombo.addActionListener(e -> {
+            Amenity selected = (Amenity) amenityCombo.getSelectedItem();
+            if (selected != null) {
+                amenityInfoLabel.setText(String.format("✓ %s - ₱%.2f per unit - %s",
+                        selected.getName(), selected.getRate(), selected.getDescription()));
+                amenityInfoLabel.setForeground(SUCCESS_COLOR);
+            }
+        });
+
+        // Action buttons
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        actionPanel.setOpaque(false);
+
+        JButton processRentalBtn = createActionButton("✅ Process Rental", SUCCESS_COLOR);
+        processRentalBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        processRentalBtn.addActionListener(e -> processAmenityRental(
+                guestIdField, reservationCombo, amenityCombo, quantitySpinner,
+                rentStartField, rentEndField, activeRentalsArea
+        ));
+
+        JButton refreshRentalsBtn = createActionButton("🔄 Refresh Active Rentals", SECONDARY_COLOR);
+        refreshRentalsBtn.addActionListener(e -> {
+            try {
+                String guestIdText = guestIdField.getText().trim();
+                if (!guestIdText.isEmpty()) {
+                    Long guestId = Long.parseLong(guestIdText);
+                    loadActiveRentals(guestId, activeRentalsArea);
+                }
+            } catch (Exception ex) {
+                showError("Error refreshing rentals: " + ex.getMessage());
+            }
+        });
+
+        JButton clearBtn = createActionButton("🗑️ Clear Form", WARNING_COLOR);
+        clearBtn.addActionListener(e -> {
+            guestIdField.setText("");
+            guestInfoLabel.setText("");
+            reservationInfoLabel.setText("");
+            amenityInfoLabel.setText("");
+            reservationCombo.removeAllItems();
+            amenityCombo.removeAllItems();
+            quantitySpinner.setValue(1);
+            rentStartField.setText(LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            rentEndField.setText(LocalDateTime.now().plusHours(4).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            activeRentalsArea.setText("");
+        });
+
+        actionPanel.add(processRentalBtn);
+        actionPanel.add(refreshRentalsBtn);
+        actionPanel.add(clearBtn);
+
+        panel.add(actionPanel, BorderLayout.SOUTH);
 
         return panel;
+    }
+
+    // Helper method to load active rentals
+    private void loadActiveRentals(Long guestId, JTextArea activeRentalsArea) {
+        try {
+            if (amenityRentalDAO == null) {
+                activeRentalsArea.setText("Database not connected");
+                return;
+            }
+
+            List<String> rentals = amenityRentalDAO.getActiveRentals(guestId);
+
+            if (rentals.isEmpty()) {
+                activeRentalsArea.setText("No active rentals for this guest.");
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("=== ACTIVE RENTALS ===\n\n");
+                for (String rental : rentals) {
+                    sb.append(rental).append("\n");
+                }
+                activeRentalsArea.setText(sb.toString());
+            }
+
+            updateStatus("Loaded " + rentals.size() + " active rentals");
+
+        } catch (SQLException e) {
+            activeRentalsArea.setText("Error loading active rentals: " + e.getMessage());
+        }
+    }
+
+    // Main method to process amenity rental
+    private void processAmenityRental(JTextField guestIdField, JComboBox<Reservation> reservationCombo,
+                                      JComboBox<Amenity> amenityCombo, JSpinner quantitySpinner,
+                                      JTextField rentStartField, JTextField rentEndField,
+                                      JTextArea activeRentalsArea) {
+        try {
+            if (amenityRentalDAO == null) {
+                showError("Database not connected");
+                return;
+            }
+
+            // Validate inputs
+            String guestIdText = guestIdField.getText().trim();
+            if (guestIdText.isEmpty()) {
+                showError("Please enter a Guest ID");
+                return;
+            }
+
+            Reservation selectedReservation = (Reservation) reservationCombo.getSelectedItem();
+            if (selectedReservation == null) {
+                showError("Please select a reservation. Guest must be checked-in.");
+                return;
+            }
+
+            Amenity selectedAmenity = (Amenity) amenityCombo.getSelectedItem();
+            if (selectedAmenity == null) {
+                showError("Please select an amenity");
+                return;
+            }
+
+            // Parse data
+            Long guestId = Long.parseLong(guestIdText);
+            Long reservationId = selectedReservation.getReservationId();
+            Long amenityId = selectedAmenity.getAmenityId();
+            int quantity = (Integer) quantitySpinner.getValue();
+
+            // Parse datetime with flexible format
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime rentStart = LocalDateTime.parse(rentStartField.getText().trim(), formatter);
+            LocalDateTime rentEnd = LocalDateTime.parse(rentEndField.getText().trim(), formatter);
+
+            // Validate dates
+            if (rentEnd.isBefore(rentStart) || rentEnd.isEqual(rentStart)) {
+                showError("Rental end time must be after start time!");
+                return;
+            }
+
+            if (rentStart.isBefore(LocalDateTime.now())) {
+                showError("Rental start time cannot be in the past!");
+                return;
+            }
+
+            // Calculate total cost
+            double totalCost = selectedAmenity.getRate() * quantity;
+
+            // Confirm rental
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    String.format("Process Amenity Rental:\n\n" +
+                                    "Guest ID: %d\n" +
+                                    "Reservation ID: %d\n" +
+                                    "Amenity: %s\n" +
+                                    "Quantity: %d\n" +
+                                    "Rate per unit: ₱%.2f\n" +
+                                    "Total Cost: ₱%.2f\n" +
+                                    "Start: %s\n" +
+                                    "End: %s\n\n" +
+                                    "This charge will be added to the reservation billing.\n" +
+                                    "Proceed?",
+                            guestId, reservationId, selectedAmenity.getName(), quantity,
+                            selectedAmenity.getRate(), totalCost, rentStart, rentEnd),
+                    "Confirm Amenity Rental",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            // Process rental
+            Long rentalId = amenityRentalDAO.processAmenityRental(
+                    guestId, amenityId, reservationId,
+                    rentStart, rentEnd, quantity
+            );
+
+            // Success message
+            JOptionPane.showMessageDialog(this,
+                    String.format("Amenity rental processed successfully!\n\n" +
+                                    "Rental ID: %d\n" +
+                                    "Amenity: %s\n" +
+                                    "Quantity: %d\n" +
+                                    "Total Charge: ₱%.2f\n\n" +
+                                    "The charge has been added to Reservation #%d billing.\n" +
+                                    "Rental Status: Active",
+                            rentalId, selectedAmenity.getName(), quantity, totalCost, reservationId),
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            updateStatus("Rental #" + rentalId + " processed successfully - Charge: ₱" + String.format("%.2f", totalCost));
+
+            // Refresh active rentals
+            loadActiveRentals(guestId, activeRentalsArea);
+
+            // Reset form fields
+            quantitySpinner.setValue(1);
+            rentStartField.setText(LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            rentEndField.setText(LocalDateTime.now().plusHours(4).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+
+        } catch (NumberFormatException e) {
+            showError("Invalid Guest ID format. Please enter a valid number.");
+        } catch (java.time.format.DateTimeParseException e) {
+            showError("Invalid date/time format. Please use YYYY-MM-DD HH:MM format (e.g., 2025-11-17 14:30)");
+        } catch (SQLException e) {
+            showError("Error processing rental: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            showError("Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     // REPORTS PANEL
