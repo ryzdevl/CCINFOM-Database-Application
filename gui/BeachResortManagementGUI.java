@@ -2636,9 +2636,11 @@ public class BeachResortManagementGUI extends JFrame {
             try {
                 // Parse user input to LocalDate, then convert to java.sql.Date
                 LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("YYYY-MM-DD"));
+                LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                 restockDate = java.sql.Date.valueOf(localDate);
             } catch (DateTimeParseException ex) {
                 JOptionPane.showMessageDialog(panel, "Invalid date format! Use YYYY-MM-DD", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(panel, "Invalid date format. Please use YYYY-MM-DD format (e.g., 2025-12-25)", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -3402,4 +3404,5 @@ public class BeachResortManagementGUI extends JFrame {
         });
     }
 }
+
 
