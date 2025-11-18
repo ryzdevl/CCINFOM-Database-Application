@@ -1679,6 +1679,50 @@ public class BeachResortManagementGUI extends JFrame {
         actionPanel.add(bookBtn);
         actionPanel.add(clearBtn);
 
+        JButton showReservationsBtn = createActionButton("Show All Reservations", SECONDARY_COLOR);
+        showReservationsBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        actionPanel.add(showReservationsBtn);
+
+        showReservationsBtn.addActionListener(e -> {
+            ReservationDAO reservationDAO = new ReservationDAO();
+            try {
+                List<Reservation> reservations = reservationDAO.getAllReservations("All");
+
+                // Table columns
+                String[] columns = {"Res ID", "Guest Name", "Room Code", "Check-In", "Check-Out", "Status", "Booking Channel"};
+                DefaultTableModel model = new DefaultTableModel(columns, 0);
+
+                // Add data to table
+                for (Reservation r : reservations) {
+                    model.addRow(new Object[]{
+                            r.getReservationId(),
+                            r.getGuestName(),
+                            r.getRoomCode(),
+                            r.getCheckIn(),
+                            r.getCheckOut(),
+                            r.getStatus(),
+                            r.getBookingChannel()
+                    });
+                }
+
+                JTable reservationTable = new JTable(model);
+                reservationTable.setRowHeight(25);
+                JScrollPane scrollPane = new JScrollPane(reservationTable);
+
+                // Display in dialog
+                JOptionPane.showMessageDialog(
+                        panel, // parent
+                        scrollPane,
+                        "All Reservations",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(panel, "Error fetching reservations: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        });
+
         panel.add(actionPanel, BorderLayout.SOUTH);
 
         return panel;
