@@ -1557,7 +1557,7 @@ public class BeachResortManagementGUI extends JFrame {
 
         // Guest info
         gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 3;
-        guestInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        guestInfoLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
         guestInfoLabel.setForeground(SUCCESS_COLOR);
         formPanel.add(guestInfoLabel, gbc);
 
@@ -1575,7 +1575,7 @@ public class BeachResortManagementGUI extends JFrame {
         formPanel.add(checkAvailBtn, gbc);
 
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 3;
-        roomInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        roomInfoLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
         roomInfoLabel.setForeground(SUCCESS_COLOR);
         formPanel.add(roomInfoLabel, gbc);
 
@@ -1658,7 +1658,7 @@ public class BeachResortManagementGUI extends JFrame {
         actionPanel.setOpaque(false);
 
         JButton bookBtn = createActionButton("✅ Create Reservation", SUCCESS_COLOR);
-        bookBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        bookBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
         bookBtn.addActionListener(e -> createReservationWithDatePicker(
                 guestIdField, roomIdField, checkInDatePicker, checkOutDatePicker,
                 channelCombo, amenityCheckboxes
@@ -3074,7 +3074,7 @@ public class BeachResortManagementGUI extends JFrame {
 
         // Guest info display
         gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 3;
-        guestInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        guestInfoLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
         guestInfoLabel.setForeground(SUCCESS_COLOR);
         formPanel.add(guestInfoLabel, gbc);
 
@@ -3099,7 +3099,7 @@ public class BeachResortManagementGUI extends JFrame {
         // Reservation info display
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 3;
         JLabel reservationInfoLabel = new JLabel("");
-        reservationInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        reservationInfoLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
         reservationInfoLabel.setForeground(SUCCESS_COLOR);
         formPanel.add(reservationInfoLabel, gbc);
 
@@ -3130,7 +3130,7 @@ public class BeachResortManagementGUI extends JFrame {
         // Amenity info display
         gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 3;
         JLabel amenityInfoLabel = new JLabel("");
-        amenityInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        amenityInfoLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
         amenityInfoLabel.setForeground(SUCCESS_COLOR);
         formPanel.add(amenityInfoLabel, gbc);
 
@@ -3277,7 +3277,7 @@ public class BeachResortManagementGUI extends JFrame {
         amenityCombo.addActionListener(e -> {
             Amenity selected = (Amenity) amenityCombo.getSelectedItem();
             if (selected != null) {
-                amenityInfoLabel.setText(String.format("✓ %s - ₱%.2f per unit - %s",
+                amenityInfoLabel.setText(String.format("✓ %s - %.2f per unit - %s",
                         selected.getName(), selected.getRate(), selected.getDescription()));
                 amenityInfoLabel.setForeground(SUCCESS_COLOR);
             }
@@ -3288,7 +3288,7 @@ public class BeachResortManagementGUI extends JFrame {
         actionPanel.setOpaque(false);
 
         JButton processRentalBtn = createActionButton("✅ Process Rental", SUCCESS_COLOR);
-        processRentalBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        processRentalBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
         processRentalBtn.addActionListener(e -> processAmenityRental(
                 guestIdField, reservationCombo, amenityCombo, quantitySpinner,
                 rentStartField, rentEndField, activeRentalsArea
