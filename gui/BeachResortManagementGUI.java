@@ -3420,7 +3420,13 @@ public class BeachResortManagementGUI extends JFrame {
         headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
         panel.add(headerLabel, BorderLayout.NORTH);
 
-        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        DefaultTableModel model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // all cells are non-editable
+            }
+        };
+
         for (String[] row : data) {
             model.addRow(row);
         }
