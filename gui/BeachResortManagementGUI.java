@@ -2963,21 +2963,22 @@ public class BeachResortManagementGUI extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Guest ID field with search
+// Guest ID field with search
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
         formPanel.add(new JLabel("Guest ID:"), gbc);
 
-        gbc.gridx = 1;
+        gbc.gridx = 1; gbc.gridwidth = 1;
         JTextField guestIdField = new JTextField(15);
         formPanel.add(guestIdField, gbc);
 
         gbc.gridx = 2;
         JButton searchGuestBtn = createActionButton("🔍 Search Guest", PRIMARY_COLOR);
+        JLabel guestInfoLabel = new JLabel("");
+        searchGuestBtn.addActionListener(e -> searchGuest(guestIdField, guestInfoLabel));
         formPanel.add(searchGuestBtn, gbc);
 
         // Guest info display
         gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 3;
-        JLabel guestInfoLabel = new JLabel("");
         guestInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         guestInfoLabel.setForeground(SUCCESS_COLOR);
         formPanel.add(guestInfoLabel, gbc);
