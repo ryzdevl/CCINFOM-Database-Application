@@ -13,6 +13,8 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
 import models.*;
+import javax.swing.JSpinner.DateEditor;
+import javax.swing.SpinnerDateModel;
 
 public class BeachResortManagementGUI extends JFrame {
 
@@ -517,25 +519,25 @@ public class BeachResortManagementGUI extends JFrame {
                 "Add New Guest", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (result == JOptionPane.OK_OPTION) {
-         String firstName = firstNameField.getText().trim();
-         String lastName = lastNameField.getText().trim();
-         String phone = phoneField.getText().trim();
-         String email = emailField.getText().trim();
-         String passport = passportField.getText().trim();
+            String firstName = firstNameField.getText().trim();
+            String lastName = lastNameField.getText().trim();
+            String phone = phoneField.getText().trim();
+            String email = emailField.getText().trim();
+            String passport = passportField.getText().trim();
 
-         if(firstName.isEmpty() || lastName.isEmpty()) {
-            showError("First Name and Last Name are both required.");
-            return;
-         }
+            if(firstName.isEmpty() || lastName.isEmpty()) {
+                showError("First Name and Last Name are both required.");
+                return;
+            }
 
-         try {
-            Guest guest = new Guest(firstName, lastName, phone, email, passport);
-            Long id = guestDAO.addGuest(guest);
-            JOptionPane.showMessageDialog(this, "Guest Added Successfully with ID: " + id, "Success", JOptionPane.INFORMATION_MESSAGE);
-            loadGuestData(model);
-         } catch (SQLException e) {
-            showError("Error adding guest: " + e.getMessage());
-         }
+            try {
+                Guest guest = new Guest(firstName, lastName, phone, email, passport);
+                Long id = guestDAO.addGuest(guest);
+                JOptionPane.showMessageDialog(this, "Guest Added Successfully with ID: " + id, "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadGuestData(model);
+            } catch (SQLException e) {
+                showError("Error adding guest: " + e.getMessage());
+            }
         }
     }
 
@@ -788,8 +790,8 @@ public class BeachResortManagementGUI extends JFrame {
     private String generateRoomCode(String roomType) {
         String prefix;
         if (roomType == null) {
-                prefix = "RM";
-       }else {
+            prefix = "RM";
+        }else {
             switch (roomType.toLowerCase()) {
                 case "standard" -> prefix = "STD";
                 case "deluxe"   -> prefix = "DLX";
@@ -801,8 +803,8 @@ public class BeachResortManagementGUI extends JFrame {
         // Use last digits of current time to keep it "unique enough"
         long suffix = System.currentTimeMillis() % 1_000_000;
         return prefix + "-" + suffix;
-    }    
-    
+    }
+
     private void addRoom(DefaultTableModel model) {
         if (roomDAO == null) {
             JOptionPane.showMessageDialog(this, "Database connection not ready.", "Error", JOptionPane.WARNING_MESSAGE);
@@ -833,45 +835,45 @@ public class BeachResortManagementGUI extends JFrame {
         int result = JOptionPane.showConfirmDialog(this, inputPanel, "Add New Room", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
-           //removed string roomcode
-           String roomType = (String) roomTypeCombo.getSelectedItem();
-           String bedType  = (String) bedTypeCombo.getSelectedItem();
-           int maxCap      = (Integer) capacitySpinner.getValue();
-           String rateText = rateField.getText().trim();
-           String desc = descArea.getText().trim();
+            //removed string roomcode
+            String roomType = (String) roomTypeCombo.getSelectedItem();
+            String bedType  = (String) bedTypeCombo.getSelectedItem();
+            int maxCap      = (Integer) capacitySpinner.getValue();
+            String rateText = rateField.getText().trim();
+            String desc = descArea.getText().trim();
 
-          //removed if room code is empty (it was here before)
-           if(roomType == null || roomType.trim().isEmpty()) {
-            showError("Room Type is Required!");
-            return;
-           }
-           if(maxCap <= 0) {
-            showError("Max Capacity must be atleast 1.");
-            return;
-           }
-           double rate;
-           try {
-            rate = Double.parseDouble(rateText);
-           } catch (NumberFormatException ex) {
-            showError("Invalid rate format. Please enter a valid number.");
-            return;
-           }
-           if(rate <= 0) {
-            showError("Rate per night must be greater than 0.");
-            return;
-           }
-           //auto generate the room code
-           String roomCode = generateRoomCode(roomType);
-           try {
-            Room room = new Room(roomCode, roomType, bedType, maxCap, rate);
-            room.setDescription(desc);
+            //removed if room code is empty (it was here before)
+            if(roomType == null || roomType.trim().isEmpty()) {
+                showError("Room Type is Required!");
+                return;
+            }
+            if(maxCap <= 0) {
+                showError("Max Capacity must be atleast 1.");
+                return;
+            }
+            double rate;
+            try {
+                rate = Double.parseDouble(rateText);
+            } catch (NumberFormatException ex) {
+                showError("Invalid rate format. Please enter a valid number.");
+                return;
+            }
+            if(rate <= 0) {
+                showError("Rate per night must be greater than 0.");
+                return;
+            }
+            //auto generate the room code
+            String roomCode = generateRoomCode(roomType);
+            try {
+                Room room = new Room(roomCode, roomType, bedType, maxCap, rate);
+                room.setDescription(desc);
 
-            long id = roomDAO.addRoom(room);
-            JOptionPane.showMessageDialog(this, "Room added successfully with ID: " + id + "\n Generated Room Code: " +roomCode, "Success", JOptionPane.INFORMATION_MESSAGE);
-            loadRoomData(model);
-           } catch (SQLException e) {
-            showError("Error adding room: " + e.getMessage());
-           }
+                long id = roomDAO.addRoom(room);
+                JOptionPane.showMessageDialog(this, "Room added successfully with ID: " + id + "\n Generated Room Code: " +roomCode, "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadRoomData(model);
+            } catch (SQLException e) {
+                showError("Error adding room: " + e.getMessage());
+            }
         }
     }
 
@@ -919,53 +921,53 @@ public class BeachResortManagementGUI extends JFrame {
             int result = JOptionPane.showConfirmDialog(this, inputPanel, "Edit Room", JOptionPane.OK_CANCEL_OPTION);
 
             if (result == JOptionPane.OK_OPTION) {
-            //removed roomcode
-            String roomType = (String) roomTypeCombo.getSelectedItem();
-            String bedType  = (String) bedTypeCombo.getSelectedItem();
-            int maxCap      = (Integer) capacitySpinner.getValue();
-            String rateText = rateField.getText().trim();
-            String status   = (String) statusCombo.getSelectedItem();
+                //removed roomcode
+                String roomType = (String) roomTypeCombo.getSelectedItem();
+                String bedType  = (String) bedTypeCombo.getSelectedItem();
+                int maxCap      = (Integer) capacitySpinner.getValue();
+                String rateText = rateField.getText().trim();
+                String status   = (String) statusCombo.getSelectedItem();
 
-           //removed if room code
-            if (roomType == null || roomType.trim().isEmpty()) {
-                showError("Room Type is required.");
-                return;
-            }
-            if (status == null || status.trim().isEmpty()) {
-                showError("Status is required.");
-                return;
-            }
-            if (maxCap <= 0) {
-                showError("Max Capacity must be at least 1.");
-                return;
-            }
+                //removed if room code
+                if (roomType == null || roomType.trim().isEmpty()) {
+                    showError("Room Type is required.");
+                    return;
+                }
+                if (status == null || status.trim().isEmpty()) {
+                    showError("Status is required.");
+                    return;
+                }
+                if (maxCap <= 0) {
+                    showError("Max Capacity must be at least 1.");
+                    return;
+                }
 
-            double rate;
-            try {
-                rate = Double.parseDouble(rateText);
-            } catch (NumberFormatException ex) {
-                showError("Invalid rate format. Please enter a valid number.");
-                return;
-            }
-            if (rate <= 0) {
-                showError("Rate per night must be greater than 0.");
-                return;
-            }
+                double rate;
+                try {
+                    rate = Double.parseDouble(rateText);
+                } catch (NumberFormatException ex) {
+                    showError("Invalid rate format. Please enter a valid number.");
+                    return;
+                }
+                if (rate <= 0) {
+                    showError("Rate per night must be greater than 0.");
+                    return;
+                }
 
-            //removed set roomcode
-            room.setRoomType(roomType);
-            room.setBedType(bedType);
-            room.setMaxCapacity(maxCap);
-            room.setRatePerNight(rate);
-            room.setStatus(status);
+                //removed set roomcode
+                room.setRoomType(roomType);
+                room.setBedType(bedType);
+                room.setMaxCapacity(maxCap);
+                room.setRatePerNight(rate);
+                room.setStatus(status);
 
-            roomDAO.updateRoom(room);
-            JOptionPane.showMessageDialog(this, "Room updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            loadRoomData(model);
+                roomDAO.updateRoom(room);
+                JOptionPane.showMessageDialog(this, "Room updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadRoomData(model);
+            }
+        } catch (SQLException e) {
+            showError("Error updating room: " + e.getMessage());
         }
-    } catch (SQLException e) {
-        showError("Error updating room: " + e.getMessage());
-    }
     }
 
     private void deleteRoom(JTable table, DefaultTableModel model) {
@@ -1500,7 +1502,7 @@ public class BeachResortManagementGUI extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Guest ID field with search
+// Guest ID field with search
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
         formPanel.add(new JLabel("Guest ID:"), gbc);
 
@@ -1539,92 +1541,33 @@ public class BeachResortManagementGUI extends JFrame {
         roomInfoLabel.setForeground(SUCCESS_COLOR);
         formPanel.add(roomInfoLabel, gbc);
 
-        // Check-in Date with Dropdowns
+        // Check-in Date with Calendar Picker
         gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 1;
         formPanel.add(new JLabel("Check-In Date:"), gbc);
 
         gbc.gridx = 1; gbc.gridwidth = 2;
-        JPanel checkInPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        JPanel checkInPanel = new JPanel(new BorderLayout(5, 0));
         checkInPanel.setOpaque(false);
 
-        // Year dropdown for check-in
-        JComboBox<Integer> checkInYearCombo = new JComboBox<>();
-        int currentYear = LocalDate.now().getYear();
-        for (int i = currentYear; i <= currentYear + 2; i++) {
-            checkInYearCombo.addItem(i);
-        }
-
-        // Month dropdown for check-in
-        String[] months = {"January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"};
-        JComboBox<String> checkInMonthCombo = new JComboBox<>(months);
-        checkInMonthCombo.setSelectedIndex(LocalDate.now().getMonthValue() - 1);
-
-        // Day dropdown for check-in
-        JComboBox<Integer> checkInDayCombo = new JComboBox<>();
-        updateDayCombo(checkInDayCombo, (Integer)checkInYearCombo.getSelectedItem(),
-                checkInMonthCombo.getSelectedIndex() + 1);
-        checkInDayCombo.setSelectedItem(LocalDate.now().getDayOfMonth());
-
-        checkInPanel.add(new JLabel("Year:"));
-        checkInPanel.add(checkInYearCombo);
-        checkInPanel.add(new JLabel("Month:"));
-        checkInPanel.add(checkInMonthCombo);
-        checkInPanel.add(new JLabel("Day:"));
-        checkInPanel.add(checkInDayCombo);
+        // Create date picker for check-in
+        DatePickerPanel checkInDatePicker = new DatePickerPanel(LocalDate.now());
+        checkInPanel.add(checkInDatePicker, BorderLayout.CENTER);
 
         formPanel.add(checkInPanel, gbc);
 
-        // Check-out Date with Dropdowns
+        // Check-out Date with Calendar Picker
         gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 1;
         formPanel.add(new JLabel("Check-Out Date:"), gbc);
 
         gbc.gridx = 1; gbc.gridwidth = 2;
-        JPanel checkOutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        JPanel checkOutPanel = new JPanel(new BorderLayout(5, 0));
         checkOutPanel.setOpaque(false);
 
-        // Year dropdown for check-out
-        JComboBox<Integer> checkOutYearCombo = new JComboBox<>();
-        for (int i = currentYear; i <= currentYear + 2; i++) {
-            checkOutYearCombo.addItem(i);
-        }
-
-        // Month dropdown for check-out
-        JComboBox<String> checkOutMonthCombo = new JComboBox<>(months);
-        LocalDate defaultCheckOut = LocalDate.now().plusDays(3);
-        checkOutMonthCombo.setSelectedIndex(defaultCheckOut.getMonthValue() - 1);
-
-        // Day dropdown for check-out
-        JComboBox<Integer> checkOutDayCombo = new JComboBox<>();
-        updateDayCombo(checkOutDayCombo, (Integer)checkOutYearCombo.getSelectedItem(),
-                checkOutMonthCombo.getSelectedIndex() + 1);
-        checkOutDayCombo.setSelectedItem(defaultCheckOut.getDayOfMonth());
-
-        checkOutPanel.add(new JLabel("Year:"));
-        checkOutPanel.add(checkOutYearCombo);
-        checkOutPanel.add(new JLabel("Month:"));
-        checkOutPanel.add(checkOutMonthCombo);
-        checkOutPanel.add(new JLabel("Day:"));
-        checkOutPanel.add(checkOutDayCombo);
+        // Create date picker for check-out (3 days from now)
+        DatePickerPanel checkOutDatePicker = new DatePickerPanel(LocalDate.now().plusDays(3));
+        checkOutPanel.add(checkOutDatePicker, BorderLayout.CENTER);
 
         formPanel.add(checkOutPanel, gbc);
-
-        // Update day combos when year or month changes
-        checkInYearCombo.addActionListener(e -> updateDayCombo(checkInDayCombo,
-                (Integer)checkInYearCombo.getSelectedItem(),
-                checkInMonthCombo.getSelectedIndex() + 1));
-
-        checkInMonthCombo.addActionListener(e -> updateDayCombo(checkInDayCombo,
-                (Integer)checkInYearCombo.getSelectedItem(),
-                checkInMonthCombo.getSelectedIndex() + 1));
-
-        checkOutYearCombo.addActionListener(e -> updateDayCombo(checkOutDayCombo,
-                (Integer)checkOutYearCombo.getSelectedItem(),
-                checkOutMonthCombo.getSelectedIndex() + 1));
-
-        checkOutMonthCombo.addActionListener(e -> updateDayCombo(checkOutDayCombo,
-                (Integer)checkOutYearCombo.getSelectedItem(),
-                checkOutMonthCombo.getSelectedIndex() + 1));
 
         // Booking Channel
         gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 1;
@@ -1654,9 +1597,8 @@ public class BeachResortManagementGUI extends JFrame {
         formPanel.add(amenityPanel, gbc);
 
         // Availability check button action
-        checkAvailBtn.addActionListener(e -> checkRoomAvailabilityWithDropdowns(
-                roomIdField, checkInYearCombo, checkInMonthCombo, checkInDayCombo,
-                checkOutYearCombo, checkOutMonthCombo, checkOutDayCombo, roomInfoLabel
+        checkAvailBtn.addActionListener(e -> checkRoomAvailabilityWithDatePicker(
+                roomIdField, checkInDatePicker, checkOutDatePicker, roomInfoLabel
         ));
 
         panel.add(formPanel, BorderLayout.CENTER);
@@ -1666,11 +1608,9 @@ public class BeachResortManagementGUI extends JFrame {
         actionPanel.setOpaque(false);
 
         JButton bookBtn = createActionButton("✅ Create Reservation", SUCCESS_COLOR);
-        bookBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
-        bookBtn.addActionListener(e -> createReservationWithDropdowns(
-                guestIdField, roomIdField,
-                checkInYearCombo, checkInMonthCombo, checkInDayCombo,
-                checkOutYearCombo, checkOutMonthCombo, checkOutDayCombo,
+        bookBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        bookBtn.addActionListener(e -> createReservationWithDatePicker(
+                guestIdField, roomIdField, checkInDatePicker, checkOutDatePicker,
                 channelCombo, amenityCheckboxes
         ));
 
@@ -1681,19 +1621,8 @@ public class BeachResortManagementGUI extends JFrame {
             guestInfoLabel.setText("");
             roomInfoLabel.setText("");
             channelCombo.setSelectedIndex(1);
-
-            // Reset to current date
-            LocalDate now = LocalDate.now();
-            checkInYearCombo.setSelectedItem(now.getYear());
-            checkInMonthCombo.setSelectedIndex(now.getMonthValue() - 1);
-            checkInDayCombo.setSelectedItem(now.getDayOfMonth());
-
-            // Reset to 3 days from now
-            LocalDate future = now.plusDays(3);
-            checkOutYearCombo.setSelectedItem(future.getYear());
-            checkOutMonthCombo.setSelectedIndex(future.getMonthValue() - 1);
-            checkOutDayCombo.setSelectedItem(future.getDayOfMonth());
-
+            checkInDatePicker.setDate(LocalDate.now());
+            checkOutDatePicker.setDate(LocalDate.now().plusDays(3));
             for (JCheckBox cb : amenityCheckboxes) {
                 if (cb != null) cb.setSelected(false);
             }
@@ -1706,6 +1635,215 @@ public class BeachResortManagementGUI extends JFrame {
 
         return panel;
     }
+
+    class DatePickerPanel extends JPanel {
+        private LocalDate selectedDate;
+        private JTextField dateField;
+        private JButton calendarButton;
+        private JDialog calendarDialog;
+        private JPanel calendarPanel;
+        private JLabel monthYearLabel;
+        private int displayMonth;
+        private int displayYear;
+
+        public DatePickerPanel(LocalDate initialDate) {
+            this.selectedDate = initialDate;
+            this.displayMonth = initialDate.getMonthValue();
+            this.displayYear = initialDate.getYear();
+
+            setLayout(new BorderLayout(5, 0));
+            setOpaque(false);
+
+            // Date display field
+            dateField = new JTextField(12);
+            dateField.setEditable(false);
+            dateField.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+            dateField.setText(formatDate(selectedDate));
+
+            // Calendar button
+            calendarButton = new JButton("📅");
+            calendarButton.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
+            calendarButton.setPreferredSize(new Dimension(40, 25));
+            calendarButton.setFocusPainted(false);
+
+            calendarButton.addActionListener(e -> showCalendar());
+
+            add(dateField, BorderLayout.CENTER);
+            add(calendarButton, BorderLayout.EAST);
+        }
+
+        private void showCalendar() {
+            if (calendarDialog != null && calendarDialog.isVisible()) {
+                calendarDialog.dispose();
+                return;
+            }
+
+            calendarDialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Select Date", true);
+            calendarDialog.setLayout(new BorderLayout());
+            calendarDialog.setUndecorated(false);
+
+            // Header with month/year navigation
+            JPanel headerPanel = new JPanel(new BorderLayout());
+            headerPanel.setBackground(PRIMARY_COLOR);
+            headerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+            JButton prevButton = new JButton("◀");
+            prevButton.setFocusPainted(false);
+            prevButton.addActionListener(e -> {
+                displayMonth--;
+                if (displayMonth < 1) {
+                    displayMonth = 12;
+                    displayYear--;
+                }
+                updateCalendar();
+            });
+
+            JButton nextButton = new JButton("▶");
+            nextButton.setFocusPainted(false);
+            nextButton.addActionListener(e -> {
+                displayMonth++;
+                if (displayMonth > 12) {
+                    displayMonth = 1;
+                    displayYear++;
+                }
+                updateCalendar();
+            });
+
+            monthYearLabel = new JLabel(getMonthName(displayMonth) + " " + displayYear);
+            monthYearLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+            monthYearLabel.setForeground(Color.WHITE);
+            monthYearLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+            headerPanel.add(prevButton, BorderLayout.WEST);
+            headerPanel.add(monthYearLabel, BorderLayout.CENTER);
+            headerPanel.add(nextButton, BorderLayout.EAST);
+
+            calendarDialog.add(headerPanel, BorderLayout.NORTH);
+
+            // Calendar grid
+            calendarPanel = new JPanel(new GridLayout(0, 7, 2, 2));
+            calendarPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+            calendarPanel.setBackground(Color.WHITE);
+
+            updateCalendar();
+
+            calendarDialog.add(calendarPanel, BorderLayout.CENTER);
+
+            // Footer with Clear and Today buttons
+            JPanel footerPanel = new JPanel(new FlowLayout());
+            footerPanel.setBackground(Color.WHITE);
+
+            JButton clearButton = new JButton("Clear");
+            clearButton.addActionListener(e -> {
+                calendarDialog.dispose();
+            });
+
+            JButton todayButton = new JButton("Today");
+            todayButton.addActionListener(e -> {
+                LocalDate today = LocalDate.now();
+                setDate(today);
+                displayMonth = today.getMonthValue();
+                displayYear = today.getYear();
+                calendarDialog.dispose();
+            });
+
+            footerPanel.add(clearButton);
+            footerPanel.add(todayButton);
+
+            calendarDialog.add(footerPanel, BorderLayout.SOUTH);
+
+            calendarDialog.pack();
+            calendarDialog.setLocationRelativeTo(this);
+            calendarDialog.setVisible(true);
+        }
+
+        private void updateCalendar() {
+            calendarPanel.removeAll();
+            monthYearLabel.setText(getMonthName(displayMonth) + " " + displayYear);
+
+            // Day headers
+            String[] days = {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"};
+            for (String day : days) {
+                JLabel label = new JLabel(day, SwingConstants.CENTER);
+                label.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                label.setForeground(new Color(127, 140, 141));
+                calendarPanel.add(label);
+            }
+
+            // Get first day of month and number of days
+            LocalDate firstDay = LocalDate.of(displayYear, displayMonth, 1);
+            int daysInMonth = firstDay.lengthOfMonth();
+            int startDayOfWeek = firstDay.getDayOfWeek().getValue() % 7; // Sunday = 0
+
+            // Add empty cells for days before month starts
+            for (int i = 0; i < startDayOfWeek; i++) {
+                calendarPanel.add(new JLabel(""));
+            }
+
+            // Add day buttons
+            LocalDate today = LocalDate.now();
+            for (int day = 1; day <= daysInMonth; day++) {
+                final int dayNum = day;
+                LocalDate date = LocalDate.of(displayYear, displayMonth, day);
+
+                JButton dayButton = new JButton(String.valueOf(day));
+                dayButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+                dayButton.setFocusPainted(false);
+                dayButton.setBorderPainted(true);
+                dayButton.setContentAreaFilled(true);
+
+                // Highlight today
+                if (date.equals(today)) {
+                    dayButton.setBackground(SECONDARY_COLOR);
+                    dayButton.setForeground(Color.WHITE);
+                    dayButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                } else {
+                    dayButton.setBackground(Color.WHITE);
+                    dayButton.setForeground(Color.BLACK);
+                }
+
+                // Highlight selected date
+                if (date.equals(selectedDate)) {
+                    dayButton.setBackground(PRIMARY_COLOR);
+                    dayButton.setForeground(Color.WHITE);
+                    dayButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                }
+
+                dayButton.addActionListener(e -> {
+                    LocalDate newDate = LocalDate.of(displayYear, displayMonth, dayNum);
+                    setDate(newDate);
+                    calendarDialog.dispose();
+                });
+
+                calendarPanel.add(dayButton);
+            }
+
+            calendarPanel.revalidate();
+            calendarPanel.repaint();
+        }
+
+        private String formatDate(LocalDate date) {
+            return String.format("%02d/%02d/%04d", date.getMonthValue(), date.getDayOfMonth(), date.getYear());
+        }
+
+        private String getMonthName(int month) {
+            String[] months = {"", "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"};
+            return months[month];
+        }
+
+        public LocalDate getDate() {
+            return selectedDate;
+        }
+
+        public void setDate(LocalDate date) {
+            this.selectedDate = date;
+            this.displayMonth = date.getMonthValue();
+            this.displayYear = date.getYear();
+            dateField.setText(formatDate(date));
+        }
+    }
+
 
     // Helper method to update day combo based on selected year and month
     private void updateDayCombo(JComboBox<Integer> dayCombo, int year, int month) {
@@ -1737,15 +1875,12 @@ public class BeachResortManagementGUI extends JFrame {
         return LocalDate.of(year, month, day);
     }
 
-    // Updated checkRoomAvailability method for dropdowns
-    private void checkRoomAvailabilityWithDropdowns(JTextField roomIdField,
-                                                    JComboBox<Integer> checkInYearCombo,
-                                                    JComboBox<String> checkInMonthCombo,
-                                                    JComboBox<Integer> checkInDayCombo,
-                                                    JComboBox<Integer> checkOutYearCombo,
-                                                    JComboBox<String> checkOutMonthCombo,
-                                                    JComboBox<Integer> checkOutDayCombo,
-                                                    JLabel roomInfoLabel) {
+// Updated helper methods for date picker
+
+    private void checkRoomAvailabilityWithDatePicker(JTextField roomIdField,
+                                                     DatePickerPanel checkInPicker,
+                                                     DatePickerPanel checkOutPicker,
+                                                     JLabel roomInfoLabel) {
         try {
             if (roomDAO == null) {
                 showError("Database not connected");
@@ -1762,15 +1897,14 @@ public class BeachResortManagementGUI extends JFrame {
             Room room = roomDAO.getRoomById(roomId);
 
             if (room == null) {
-                roomInfoLabel.setText("Room not found");
+                roomInfoLabel.setText("✗ Room not found");
                 roomInfoLabel.setForeground(DANGER_COLOR);
                 showError("Room with ID " + roomId + " not found!");
                 return;
             }
 
-            // Get dates from dropdowns
-            LocalDate checkIn = getDateFromDropdowns(checkInYearCombo, checkInMonthCombo, checkInDayCombo);
-            LocalDate checkOut = getDateFromDropdowns(checkOutYearCombo, checkOutMonthCombo, checkOutDayCombo);
+            LocalDate checkIn = checkInPicker.getDate();
+            LocalDate checkOut = checkOutPicker.getDate();
 
             // Validate dates
             if (checkOut.isBefore(checkIn) || checkOut.isEqual(checkIn)) {
@@ -1804,16 +1938,11 @@ public class BeachResortManagementGUI extends JFrame {
         }
     }
 
-    // Updated createReservation method for dropdowns
-    private void createReservationWithDropdowns(JTextField guestIdField, JTextField roomIdField,
-                                                JComboBox<Integer> checkInYearCombo,
-                                                JComboBox<String> checkInMonthCombo,
-                                                JComboBox<Integer> checkInDayCombo,
-                                                JComboBox<Integer> checkOutYearCombo,
-                                                JComboBox<String> checkOutMonthCombo,
-                                                JComboBox<Integer> checkOutDayCombo,
-                                                JComboBox<String> channelCombo,
-                                                JCheckBox[] amenityCheckboxes) {
+    private void createReservationWithDatePicker(JTextField guestIdField, JTextField roomIdField,
+                                                 DatePickerPanel checkInPicker,
+                                                 DatePickerPanel checkOutPicker,
+                                                 JComboBox<String> channelCombo,
+                                                 JCheckBox[] amenityCheckboxes) {
         try {
             if (reservationDAO == null) {
                 showError("Database not connected");
@@ -1829,11 +1958,8 @@ public class BeachResortManagementGUI extends JFrame {
             // Parse data
             Long guestId = Long.parseLong(guestIdField.getText().trim());
             Long roomId = Long.parseLong(roomIdField.getText().trim());
-
-            // Get dates from dropdowns
-            LocalDate checkIn = getDateFromDropdowns(checkInYearCombo, checkInMonthCombo, checkInDayCombo);
-            LocalDate checkOut = getDateFromDropdowns(checkOutYearCombo, checkOutMonthCombo, checkOutDayCombo);
-
+            LocalDate checkIn = checkInPicker.getDate();
+            LocalDate checkOut = checkOutPicker.getDate();
             String bookingChannel = (String) channelCombo.getSelectedItem();
 
             // Validate dates
@@ -1880,7 +2006,7 @@ public class BeachResortManagementGUI extends JFrame {
                 return;
             }
 
-            // Call DAO to create reservation (with transaction)
+            // Call DAO to create reservation
             Long reservationId = reservationDAO.createReservation(reservation, selectedAmenities);
 
             // Success message
@@ -1900,18 +2026,8 @@ public class BeachResortManagementGUI extends JFrame {
             guestIdField.setText("");
             roomIdField.setText("");
             channelCombo.setSelectedIndex(1);
-
-            // Reset dates to defaults
-            LocalDate now = LocalDate.now();
-            checkInYearCombo.setSelectedItem(now.getYear());
-            checkInMonthCombo.setSelectedIndex(now.getMonthValue() - 1);
-            checkInDayCombo.setSelectedItem(now.getDayOfMonth());
-
-            LocalDate future = now.plusDays(3);
-            checkOutYearCombo.setSelectedItem(future.getYear());
-            checkOutMonthCombo.setSelectedIndex(future.getMonthValue() - 1);
-            checkOutDayCombo.setSelectedItem(future.getDayOfMonth());
-
+            checkInPicker.setDate(LocalDate.now());
+            checkOutPicker.setDate(LocalDate.now().plusDays(3));
             for (JCheckBox cb : amenityCheckboxes) {
                 if (cb != null) cb.setSelected(false);
             }
@@ -2506,7 +2622,7 @@ public class BeachResortManagementGUI extends JFrame {
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         actionPanel.setOpaque(false);
 
-        JButton checkOutBtn = createActionButton("✅ Confirm Check-Out", DANGER_COLOR);
+        JButton checkOutBtn = createActionButton("📤 Confirm Check-Out", DANGER_COLOR);
         checkOutBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
 
         actionPanel.add(checkOutBtn);
@@ -2706,7 +2822,7 @@ public class BeachResortManagementGUI extends JFrame {
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         actionPanel.setOpaque(false);
 
-        JButton processBtn = createActionButton("✅ Process Restock", SUCCESS_COLOR);
+        JButton processBtn = createActionButton("Process Restock", SUCCESS_COLOR);
         processBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
 
         actionPanel.add(processBtn);
@@ -3076,7 +3192,7 @@ public class BeachResortManagementGUI extends JFrame {
         actionPanel.setOpaque(false);
 
         JButton processRentalBtn = createActionButton("✅ Process Rental", SUCCESS_COLOR);
-        processRentalBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
+        processRentalBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
         processRentalBtn.addActionListener(e -> processAmenityRental(
                 guestIdField, reservationCombo, amenityCombo, quantitySpinner,
                 rentStartField, rentEndField, activeRentalsArea
@@ -3512,4 +3628,3 @@ public class BeachResortManagementGUI extends JFrame {
         });
     }
 }
-
