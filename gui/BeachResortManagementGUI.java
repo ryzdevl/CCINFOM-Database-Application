@@ -2946,11 +2946,11 @@ public class BeachResortManagementGUI extends JFrame {
 
         // DATE
         gbc.gridx = 0; gbc.gridy = 4;
-        formPanel.add(new JLabel("Restock Date (YYYY-MM-DD):"), gbc);
+        formPanel.add(new JLabel("Restock Date:"), gbc);
 
-        JTextField dateField = new JTextField();
+        DatePickerPanel restockDatePicker = new DatePickerPanel(LocalDate.now());
         gbc.gridx = 1;
-        formPanel.add(dateField, gbc);
+        formPanel.add(restockDatePicker, gbc);
 
         // ---------- INVENTORY TABLE ----------
         JTable inventoryTable = new JTable();
@@ -2986,17 +2986,12 @@ public class BeachResortManagementGUI extends JFrame {
             String supplier = supplierField.getText().trim();
             String notes = notesArea.getText().trim();
 
-            String dateStr = dateField.getText().trim();
-            java.sql.Date restockDate;
-
-            try {
-                // Parse user input to LocalDate, then convert to java.sql.Date
-                LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                restockDate = java.sql.Date.valueOf(localDate);
-            } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(panel, "Invalid date format. Please use YYYY-MM-DD format (e.g., 2025-12-25)", "Error", JOptionPane.ERROR_MESSAGE);
+            LocalDate localDate = restockDatePicker.getDate();
+            if (localDate == null) {
+                JOptionPane.showMessageDialog(panel, "Please select a restock date.", "Error", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            java.sql.Date restockDate = java.sql.Date.valueOf(localDate);
 
             int quantity;
 
