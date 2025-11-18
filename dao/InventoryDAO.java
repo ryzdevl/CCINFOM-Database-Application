@@ -95,7 +95,7 @@ public class InventoryDAO {
 
         try {
             conn = DatabaseConnection.getConnection();
-            String sql = "SELECT * FROM inventory_item ORDER BY name";
+            String sql = "SELECT * FROM inventory_item ORDER BY item_id";
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
 
@@ -221,3 +221,4 @@ public class InventoryDAO {
         }
     }
 }
+
