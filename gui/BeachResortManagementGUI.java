@@ -3261,7 +3261,7 @@ public class BeachResortManagementGUI extends JFrame {
                     }
                     Amenity selected = (Amenity) amenityCombo.getSelectedItem();
                     if (selected != null) {
-                        amenityInfoLabel.setText(String.format("✓ %s - ₱%.2f per unit",
+                        amenityInfoLabel.setText(String.format("✓ %s - %.2f per unit",
                                 selected.getName(), selected.getRate()));
                         amenityInfoLabel.setForeground(SUCCESS_COLOR);
                     }
