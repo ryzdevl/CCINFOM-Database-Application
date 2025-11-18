@@ -3432,7 +3432,7 @@ public class BeachResortManagementGUI extends JFrame {
         }
 
         JTable table = new JTable(model);
-        table.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.setRowHeight(25);
         table.getTableHeader().setFont(new Font("Segoe UI Emoji", Font.BOLD, 13));
 
@@ -3512,3 +3512,4 @@ public class BeachResortManagementGUI extends JFrame {
         });
     }
 }
+
