@@ -19,7 +19,7 @@ public class DashboardDAO {
 
     // 2. Active Reservations
     public int getActiveReservations() throws SQLException {
-        String sql = "SELECT COUNT(*) FROM reservation WHERE status = 'reserved'";
+        String sql = "SELECT COUNT(*) FROM room WHERE status = 'reserved'";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -64,7 +64,7 @@ public class DashboardDAO {
 
     // 6. Amenities Rented
     public int getAmenitiesRented() throws SQLException {
-        String sql = "SELECT COUNT(*) FROM amenity_rental WHERE status = 'rented'";
+        String sql = "SELECT COUNT(*) FROM amenity_rental WHERE status = 'active'";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
