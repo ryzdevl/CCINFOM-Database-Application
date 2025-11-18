@@ -218,7 +218,7 @@ public class AmenityDAO {
             result.append("AMENITY INFORMATION\n");
             result.append("===================\n");
             result.append("Name: ").append(amenity.getName()).append("\n");
-            result.append("Rate: $").append(amenity.getRate()).append("\n");
+            result.append("Rate: ₱").append(amenity.getRate()).append("\n");
             result.append("Rating: ").append(amenity.getOverallRating()).append("/5\n\n");
 
             // Get guest request statistics
