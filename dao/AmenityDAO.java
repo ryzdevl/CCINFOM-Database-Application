@@ -99,7 +99,7 @@ public class AmenityDAO {
             if (availabilityFilter != null && !availabilityFilter.isEmpty() && !availabilityFilter.equals("All")) {
                 sql += " AND availability = ?";
             }
-            sql += " ORDER BY name";
+            sql += " ORDER BY amenity_id";
 
             pstmt = conn.prepareStatement(sql);
 
@@ -248,4 +248,5 @@ public class AmenityDAO {
         }
     }
 }
+
 
