@@ -108,7 +108,7 @@ public class CheckOutDAO {
             double totalCharges = calculateTotalCharges(reservationId);
 
             if (amountPaid < totalCharges) {
-                throw new SQLException("Payment amount ($" + amountPaid + ") is less than total charges ($" + totalCharges + ")!");
+                throw new SQLException("Payment amount (₱" + amountPaid + ") is less than total charges (₱" + totalCharges + ")!");
             }
 
             // STEP 3: Insert payment record

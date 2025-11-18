@@ -101,8 +101,8 @@ public class ReportsDAO {
                 String[] row = {
                         rs.getString("room_code"),
                         rs.getString("room_type"),
-                        String.format("$%.2f", rs.getDouble("rate_per_night")),
-                        String.format("$%.2f", rs.getDouble("total_revenue"))
+                        String.format("₱%.2f", rs.getDouble("rate_per_night")),
+                        String.format("₱%.2f", rs.getDouble("total_revenue"))
                 };
                 reportData.add(row);
             }
@@ -189,10 +189,10 @@ public class ReportsDAO {
             while (rs.next()) {
                 String[] row = {
                         rs.getString("name"),
-                        String.format("$%.2f", rs.getDouble("rate")),
+                        String.format("₱%.2f", rs.getDouble("rate")),
                         String.valueOf(rs.getInt("times_rented")),
                         String.valueOf(rs.getInt("total_quantity")),
-                        String.format("$%.2f", rs.getDouble("total_revenue"))
+                        String.format("₱%.2f", rs.getDouble("total_revenue"))
                 };
                 reportData.add(row);
             }
