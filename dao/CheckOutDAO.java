@@ -1,12 +1,7 @@
 package dao;
 
 import database.DatabaseConnection;
-
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CheckOutDAO {
 
@@ -69,6 +64,24 @@ public class CheckOutDAO {
             if (rs != null) rs.close();
             if (pstmt != null) pstmt.close();
             DatabaseConnection.closeConnection(conn);
+        }
+    }
+
+    // checks for duplicate transaction references
+    public boolean isTransactionRefUnique(String transactionRef) throws SQLException {
+        String sql = "SELECT COUNT(*) " +
+                "FROM payment " +
+                "WHERE transaction_reference = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, transactionRef);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) == 0; // true if it doesn't exist
+            }
+            return true;
         }
     }
 

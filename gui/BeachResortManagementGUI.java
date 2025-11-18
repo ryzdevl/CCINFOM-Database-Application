@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.sql.SQLException;
 import java.time.*;
 import java.time.format.*;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -13,14 +14,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
 import models.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import javax.swing.JSpinner.DateEditor;
-import javax.swing.SpinnerDateModel;
-import java.time.temporal.ChronoUnit;
 
 public class BeachResortManagementGUI extends JFrame {
 
@@ -2803,10 +2796,35 @@ public class BeachResortManagementGUI extends JFrame {
                 return;
             }
 
+            String transactionRef = transactionRefField.getText().trim();
+
+            // checks that transaction ref only uses alphanumeric characters (Aa-Zz & 0-9)
+            if (!transactionRef.matches("[a-zA-Z0-9]+")) {
+                JOptionPane.showMessageDialog(null, 
+                    "Transaction reference must only contain letters and numbers.",
+                    "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // checks that transaction ref is only up to 8 characters
+            if (transactionRef.length() > 8) {
+                JOptionPane.showMessageDialog(null, 
+                    "Transaction reference must have a maximum of 8 characters.",
+                    "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             try {
+                // checks that transaction ref is unique
+                if (!checkOutDAO.isTransactionRefUnique(transactionRef)) {
+                    JOptionPane.showMessageDialog(null, 
+                        "Transaction reference already exists.",
+                        "Duplicate Reference", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
                 double amountPaid = Double.parseDouble(amountPaidField.getText());
                 String method = paymentMethodBox.getSelectedItem().toString();
-                String reference = transactionRefField.getText();
 
                 int confirm = JOptionPane.showConfirmDialog(null,
                         "Confirm CHECK-OUT for Reservation ID: " + selected.getReservationId() + " ?",
@@ -2818,7 +2836,7 @@ public class BeachResortManagementGUI extends JFrame {
                             selected.getReservationId(),
                             amountPaid,
                             method,
-                            reference
+                            transactionRef
                     );
 
                     if (ok) {
