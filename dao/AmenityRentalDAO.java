@@ -1,9 +1,7 @@
 package dao;
 
 import database.DatabaseConnection;
-
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +79,14 @@ public class AmenityRentalDAO {
             rs.close();
             pstmt.close();
 
-            // STEP 5: Add charges to reservation billing
+            // STEP 5: Update amenity availability
+            String updateAmenitySql = "UPDATE amenity SET availability = 'reserved' WHERE amenity_id = ?";
+            pstmt = conn.prepareStatement(updateAmenitySql);
+            pstmt.setLong(1, amenityId);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // STEP 6: Add charges to reservation billing
             double totalCharge = ratePerUnit * quantity;
             String addChargeSql = "INSERT INTO charge_item (reservation_id, description, qty, unit_price) " +
                     "SELECT ?, CONCAT(a.name, ' Rental'), ?, ? FROM amenity a WHERE a.amenity_id = ?";
