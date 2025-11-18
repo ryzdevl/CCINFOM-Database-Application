@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JSpinner.DateEditor;
 import javax.swing.SpinnerDateModel;
+import java.time.temporal.ChronoUnit;
 
 public class BeachResortManagementGUI extends JFrame {
 
@@ -3434,7 +3435,9 @@ public class BeachResortManagementGUI extends JFrame {
                 return;
             }
 
-            if (rentStart.isBefore(LocalDateTime.now())) {
+            //truncate now to minutes (since the import time uses second/milisecond hence the error)
+            LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+            if (rentStart.isBefore(now)) {
                 showError("Rental start time cannot be in the past!");
                 return;
             }
