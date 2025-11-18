@@ -1666,7 +1666,7 @@ public class BeachResortManagementGUI extends JFrame {
         actionPanel.setOpaque(false);
 
         JButton bookBtn = createActionButton("✅ Create Reservation", SUCCESS_COLOR);
-        bookBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        bookBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
         bookBtn.addActionListener(e -> createReservationWithDropdowns(
                 guestIdField, roomIdField,
                 checkInYearCombo, checkInMonthCombo, checkInDayCombo,
@@ -2506,7 +2506,7 @@ public class BeachResortManagementGUI extends JFrame {
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         actionPanel.setOpaque(false);
 
-        JButton checkOutBtn = createActionButton("📤 Confirm Check-Out", DANGER_COLOR);
+        JButton checkOutBtn = createActionButton("✅ Confirm Check-Out", DANGER_COLOR);
         checkOutBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
 
         actionPanel.add(checkOutBtn);
@@ -2706,7 +2706,7 @@ public class BeachResortManagementGUI extends JFrame {
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         actionPanel.setOpaque(false);
 
-        JButton processBtn = createActionButton("Process Restock", SUCCESS_COLOR);
+        JButton processBtn = createActionButton("✅ Process Restock", SUCCESS_COLOR);
         processBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
 
         actionPanel.add(processBtn);
@@ -3076,7 +3076,7 @@ public class BeachResortManagementGUI extends JFrame {
         actionPanel.setOpaque(false);
 
         JButton processRentalBtn = createActionButton("✅ Process Rental", SUCCESS_COLOR);
-        processRentalBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        processRentalBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
         processRentalBtn.addActionListener(e -> processAmenityRental(
                 guestIdField, reservationCombo, amenityCombo, quantitySpinner,
                 rentStartField, rentEndField, activeRentalsArea
