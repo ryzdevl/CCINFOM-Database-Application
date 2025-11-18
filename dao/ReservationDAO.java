@@ -269,7 +269,7 @@ public class ReservationDAO {
             if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equals("All")) {
                 sql += " AND r.status = ?";
             }
-            sql += " ORDER BY r.check_in DESC";
+            sql += " ORDER BY reservation_id";
 
             pstmt = conn.prepareStatement(sql);
 
@@ -366,3 +366,4 @@ public class ReservationDAO {
         return reservations;
     }
 }
+
