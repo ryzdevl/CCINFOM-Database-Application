@@ -104,7 +104,7 @@ public class RoomDAO {
             if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equals("All")) {
                 sql += " AND status = ?";
             }
-            sql += " ORDER BY room_code";
+            sql += " ORDER BY room_id";
 
             pstmt = conn.prepareStatement(sql);
 
@@ -360,4 +360,5 @@ public class RoomDAO {
         }
     }
 }
+
 
