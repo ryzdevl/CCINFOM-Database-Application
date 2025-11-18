@@ -105,7 +105,7 @@ public class GuestDAO {
             if (searchTerm != null && !searchTerm.isEmpty()) {
                 sql += " AND (first_name LIKE ? OR last_name LIKE ? OR email LIKE ?)";
             }
-            sql += " ORDER BY last_name, first_name";
+            sql += " ORDER BY guest_id";
 
             pstmt = conn.prepareStatement(sql);
 
@@ -315,3 +315,4 @@ public class GuestDAO {
         }
     }
 }
+
