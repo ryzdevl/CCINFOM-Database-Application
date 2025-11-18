@@ -2416,7 +2416,6 @@ public class BeachResortManagementGUI extends JFrame {
     }
 
 
-    // CHECK-IN - Placeholder
     private JPanel createCheckInPanel() {
         JPanel panel = new JPanel(new BorderLayout(15, 15));
         panel.setBackground(BG_COLOR);
@@ -2435,7 +2434,7 @@ public class BeachResortManagementGUI extends JFrame {
         headerPanel.add(assignLabel);
         panel.add(headerPanel, BorderLayout.NORTH);
 
-        // --- Form Panel ---
+        // --- LEFT: Form Panel ---
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
         formPanel.setBorder(new CompoundBorder(
@@ -2447,33 +2446,29 @@ public class BeachResortManagementGUI extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Guest ID field
-        gbc.gridx = 0; gbc.gridy = 0;
+        // Guest ID field with search
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
         formPanel.add(new JLabel("Guest ID:"), gbc);
+
         gbc.gridx = 1;
         JTextField guestIdField = new JTextField(15);
         formPanel.add(guestIdField, gbc);
 
         gbc.gridx = 2;
         JButton searchGuestBtn = createActionButton("🔍 Search Guest", PRIMARY_COLOR);
-        formPanel.add(searchGuestBtn, gbc);
-
-        // Guest info display
-        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 3;
         JLabel guestInfoLabel = new JLabel("");
-        guestInfoLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
-        guestInfoLabel.setForeground(SUCCESS_COLOR);
-        formPanel.add(guestInfoLabel, gbc);
+        searchGuestBtn.addActionListener(e -> searchGuest(guestIdField, guestInfoLabel));
+        formPanel.add(searchGuestBtn, gbc);
 
         // Reservation combo box
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
         formPanel.add(new JLabel("Select Reservation:"), gbc);
-
         gbc.gridx = 1; gbc.gridwidth = 2;
         JComboBox<Reservation> reservationCombo = new JComboBox<>();
         reservationCombo.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Reservation res) {
                     setText("ID: " + res.getReservationId() + " | Room: " + res.getRoomId() + " | Status: " + res.getStatus());
@@ -2483,32 +2478,67 @@ public class BeachResortManagementGUI extends JFrame {
         });
         formPanel.add(reservationCombo, gbc);
 
-        // Reservation info display
+        // Reservation info label
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 3;
         JLabel reservationInfoLabel = new JLabel("");
         reservationInfoLabel.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 12));
         reservationInfoLabel.setForeground(SUCCESS_COLOR);
         formPanel.add(reservationInfoLabel, gbc);
 
-        // --- Button Actions ---
+        // --- RIGHT: Reservation Table ---
+        String[] tableColumns = {"Guest ID", "Guest Name", "Reservation ID", "Room", "Status"};
+        DefaultTableModel tableModel = new DefaultTableModel(tableColumns, 0);
+        JTable reservationTable = new JTable(tableModel);
+        reservationTable.setRowHeight(25);
+        JScrollPane tableScroll = new JScrollPane(reservationTable);
 
+        // --- Populate table with all reservations initially ---
+        try {
+            ReservationDAO reservationDAO = new ReservationDAO();
+            List<Reservation> allReservations = reservationDAO.getAllReservations("All");
+            for (Reservation r : allReservations) {
+                tableModel.addRow(new Object[]{
+                        r.getGuestId(),
+                        r.getGuestName(),
+                        r.getReservationId(),
+                        r.getRoomCode(),
+                        r.getStatus()
+                });
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error loading reservations: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        // --- Split Pane ---
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, formPanel, tableScroll);
+        splitPane.setDividerLocation(400);
+        splitPane.setResizeWeight(0.4);
+        panel.add(splitPane, BorderLayout.CENTER);
+
+        // --- Bottom Action Panel ---
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        actionPanel.setOpaque(false);
+
+        JButton checkInBtn = createActionButton("✅ Confirm Check-In", SUCCESS_COLOR);
+        checkInBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
+        actionPanel.add(checkInBtn);
+
+        panel.add(actionPanel, BorderLayout.SOUTH);
+
+        // --- Button Actions ---
         searchGuestBtn.addActionListener(e -> {
             try {
                 long guestId = Long.parseLong(guestIdField.getText().trim());
                 Guest guest = guestDAO.getGuestById(guestId);
-                reservationCombo.removeAllItems(); // Clear previous reservations
+                reservationCombo.removeAllItems();
 
                 if (guest != null) {
                     guestInfoLabel.setText("Guest: " + guest.getFirstName() + " " + guest.getLastName());
-                    // Fetch active reservations for this guest
                     List<Reservation> reservations = reservationDAO.getActiveReservationsByGuestId(guestId);
                     if (reservations.isEmpty()) {
                         reservationInfoLabel.setText("No active reservations found for this guest.");
                     } else {
-                        for (Reservation res : reservations) {
-                            reservationCombo.addItem(res);
-                        }
-                        reservationCombo.setSelectedIndex(0);
+                        for (Reservation res : reservations) reservationCombo.addItem(res);
                         Reservation selected = (Reservation) reservationCombo.getSelectedItem();
                         reservationInfoLabel.setText("Selected Reservation: ID " + selected.getReservationId() +
                                 ", Room " + selected.getRoomId() + ", Status " + selected.getStatus());
@@ -2534,14 +2564,6 @@ public class BeachResortManagementGUI extends JFrame {
             }
         });
 
-        panel.add(formPanel, BorderLayout.CENTER);
-
-        // --- Action Panel ---
-        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        actionPanel.setOpaque(false);
-
-        JButton checkInBtn = createActionButton("✅ Confirm Check-In", SUCCESS_COLOR);
-        checkInBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
         checkInBtn.addActionListener(e -> {
             Reservation selected = (Reservation) reservationCombo.getSelectedItem();
             if (selected == null) {
@@ -2559,10 +2581,19 @@ public class BeachResortManagementGUI extends JFrame {
                     boolean success = reservationDAO.checkInGuest(selected.getReservationId());
                     if (success) {
                         JOptionPane.showMessageDialog(null, "Guest checked in successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        selected.setStatus("checked-in");
+                        reservationCombo.repaint();
+
+                        // Update table to reflect status change
+                        for (int i = 0; i < tableModel.getRowCount(); i++) {
+                            if (tableModel.getValueAt(i, 2).equals(selected.getReservationId())) {
+                                tableModel.setValueAt("checked-in", i, 4);
+                                break;
+                            }
+                        }
+
                         reservationInfoLabel.setText("Selected Reservation: ID " + selected.getReservationId() +
                                 ", Room " + selected.getRoomId() + ", Status checked-in");
-                        selected.setStatus("checked-in"); // Update combo display
-                        reservationCombo.repaint();
                     }
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -2570,11 +2601,9 @@ public class BeachResortManagementGUI extends JFrame {
             }
         });
 
-        actionPanel.add(checkInBtn);
-        panel.add(actionPanel, BorderLayout.SOUTH);
-
         return panel;
     }
+
 
     private void updateReservationInfo(Reservation r, JLabel label, JTextField chargeField) {
         if (r == null) return;
@@ -3261,7 +3290,7 @@ public class BeachResortManagementGUI extends JFrame {
                     }
                     Amenity selected = (Amenity) amenityCombo.getSelectedItem();
                     if (selected != null) {
-                        amenityInfoLabel.setText(String.format("✓ %s - %.2f per unit",
+                        amenityInfoLabel.setText(String.format("✓ %s - ₱%.2f per unit",
                                 selected.getName(), selected.getRate()));
                         amenityInfoLabel.setForeground(SUCCESS_COLOR);
                     }
