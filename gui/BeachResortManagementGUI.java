@@ -13,6 +13,11 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
 import models.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.swing.JSpinner.DateEditor;
 import javax.swing.SpinnerDateModel;
 
@@ -1490,7 +1495,41 @@ public class BeachResortManagementGUI extends JFrame {
 
         panel.add(headerPanel, BorderLayout.NORTH);
 
-        // Form panel
+        // ---------------- LEFT SIDE: ROOM TABLE ----------------
+        String[] roomColumns = {
+                "Room ID", "Room Code", "Room Type", "Bed Type", "Rate/Night", "Status"
+        };
+
+        DefaultTableModel roomTableModel = new DefaultTableModel(roomColumns, 0);
+        JTable roomTable = new JTable(roomTableModel);
+        roomTable.setRowHeight(25);
+
+        JScrollPane roomTableScroll = new JScrollPane(roomTable);
+
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.setOpaque(false);
+        leftPanel.add(new JLabel("Available Rooms", SwingConstants.CENTER), BorderLayout.NORTH);
+        leftPanel.add(roomTableScroll, BorderLayout.CENTER);
+
+        // LOAD ROOMS USING DAO
+        try {
+            RoomDAO roomDAO = new RoomDAO();
+            List<Room> rooms = roomDAO.getAllRooms("All"); // or "available"
+            for (Room room : rooms) {
+                roomTableModel.addRow(new Object[]{
+                        room.getRoomId(),
+                        room.getRoomCode(),
+                        room.getRoomType(),
+                        room.getBedType(),
+                        room.getRatePerNight(),
+                        room.getStatus()
+                });
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error loading rooms: " + ex.getMessage());
+        }
+
+        // ---------------- RIGHT SIDE: FORM PANEL ----------------
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
         formPanel.setBorder(new CompoundBorder(
@@ -1502,11 +1541,11 @@ public class BeachResortManagementGUI extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-// Guest ID field with search
+        // Guest ID field with search
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
         formPanel.add(new JLabel("Guest ID:"), gbc);
 
-        gbc.gridx = 1; gbc.gridwidth = 1;
+        gbc.gridx = 1;
         JTextField guestIdField = new JTextField(15);
         formPanel.add(guestIdField, gbc);
 
@@ -1516,13 +1555,13 @@ public class BeachResortManagementGUI extends JFrame {
         searchGuestBtn.addActionListener(e -> searchGuest(guestIdField, guestInfoLabel));
         formPanel.add(searchGuestBtn, gbc);
 
-        // Guest info display
+        // Guest info
         gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 3;
         guestInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         guestInfoLabel.setForeground(SUCCESS_COLOR);
         formPanel.add(guestInfoLabel, gbc);
 
-        // Room ID field with availability check
+        // Room ID field
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
         formPanel.add(new JLabel("Room ID:"), gbc);
 
@@ -1535,38 +1574,39 @@ public class BeachResortManagementGUI extends JFrame {
         JLabel roomInfoLabel = new JLabel("");
         formPanel.add(checkAvailBtn, gbc);
 
-        // Room info display
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 3;
         roomInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         roomInfoLabel.setForeground(SUCCESS_COLOR);
         formPanel.add(roomInfoLabel, gbc);
 
-        // Check-in Date with Calendar Picker
+        // AUTO-FILL ROOM ID WHEN CLICKING TABLE ROW
+        roomTable.getSelectionModel().addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting() && roomTable.getSelectedRow() != -1) {
+                String selectedRoomId = roomTable.getValueAt(roomTable.getSelectedRow(), 0).toString();
+                roomIdField.setText(selectedRoomId);
+            }
+        });
+
+        // Check-in date
         gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 1;
         formPanel.add(new JLabel("Check-In Date:"), gbc);
 
         gbc.gridx = 1; gbc.gridwidth = 2;
         JPanel checkInPanel = new JPanel(new BorderLayout(5, 0));
         checkInPanel.setOpaque(false);
-
-        // Create date picker for check-in
         DatePickerPanel checkInDatePicker = new DatePickerPanel(LocalDate.now());
         checkInPanel.add(checkInDatePicker, BorderLayout.CENTER);
-
         formPanel.add(checkInPanel, gbc);
 
-        // Check-out Date with Calendar Picker
+        // Check-out date
         gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 1;
         formPanel.add(new JLabel("Check-Out Date:"), gbc);
 
         gbc.gridx = 1; gbc.gridwidth = 2;
         JPanel checkOutPanel = new JPanel(new BorderLayout(5, 0));
         checkOutPanel.setOpaque(false);
-
-        // Create date picker for check-out (3 days from now)
         DatePickerPanel checkOutDatePicker = new DatePickerPanel(LocalDate.now().plusDays(3));
         checkOutPanel.add(checkOutDatePicker, BorderLayout.CENTER);
-
         formPanel.add(checkOutPanel, gbc);
 
         // Booking Channel
@@ -1578,16 +1618,16 @@ public class BeachResortManagementGUI extends JFrame {
         channelCombo.setSelectedIndex(1);
         formPanel.add(channelCombo, gbc);
 
-        // Amenities selection
+        // Amenities label
         gbc.gridx = 0; gbc.gridy = 7; gbc.gridwidth = 3;
         JLabel amenityLabel = new JLabel("Select Amenities (Optional):");
         amenityLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         formPanel.add(amenityLabel, gbc);
 
+        // Load amenities button
         gbc.gridy = 8;
         JPanel amenityPanel = new JPanel(new GridLayout(0, 2, 10, 5));
         amenityPanel.setOpaque(false);
-
         JCheckBox[] amenityCheckboxes = new JCheckBox[8];
         JButton loadAmenitiesBtn = createActionButton("Load Available Amenities", SECONDARY_COLOR);
         loadAmenitiesBtn.addActionListener(e -> loadAmenitiesForBooking(amenityPanel, amenityCheckboxes));
@@ -1596,14 +1636,24 @@ public class BeachResortManagementGUI extends JFrame {
         gbc.gridy = 9;
         formPanel.add(amenityPanel, gbc);
 
-        // Availability check button action
+        // Availability check
         checkAvailBtn.addActionListener(e -> checkRoomAvailabilityWithDatePicker(
                 roomIdField, checkInDatePicker, checkOutDatePicker, roomInfoLabel
         ));
 
-        panel.add(formPanel, BorderLayout.CENTER);
+        // ---------------- SPLIT PANE ----------------
+        JSplitPane splitPane = new JSplitPane(
+                JSplitPane.HORIZONTAL_SPLIT,
+                leftPanel,
+                formPanel
+        );
 
-        // Action buttons
+        splitPane.setDividerLocation(450);
+        splitPane.setResizeWeight(0.45);
+
+        panel.add(splitPane, BorderLayout.CENTER);
+
+        // ---------------- Bottom Buttons ----------------
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         actionPanel.setOpaque(false);
 
@@ -1623,9 +1673,7 @@ public class BeachResortManagementGUI extends JFrame {
             channelCombo.setSelectedIndex(1);
             checkInDatePicker.setDate(LocalDate.now());
             checkOutDatePicker.setDate(LocalDate.now().plusDays(3));
-            for (JCheckBox cb : amenityCheckboxes) {
-                if (cb != null) cb.setSelected(false);
-            }
+            for (JCheckBox cb : amenityCheckboxes) if (cb != null) cb.setSelected(false);
         });
 
         actionPanel.add(bookBtn);
@@ -1635,6 +1683,9 @@ public class BeachResortManagementGUI extends JFrame {
 
         return panel;
     }
+
+
+
 
     class DatePickerPanel extends JPanel {
         private LocalDate selectedDate;
@@ -3628,4 +3679,5 @@ public class BeachResortManagementGUI extends JFrame {
             }
         });
     }
+
 }
