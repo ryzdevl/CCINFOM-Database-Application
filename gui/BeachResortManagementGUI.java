@@ -6,7 +6,6 @@ import java.awt.event.*;
 import java.sql.SQLException;
 import java.time.*;
 import java.time.format.*;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -525,6 +524,17 @@ public class BeachResortManagementGUI extends JFrame {
             String email = emailField.getText().trim();
             String passport = passportField.getText().trim();
 
+            // only allow numbers, -, +, () in phone field
+            if (!phone.matches("[0-9 +()-]*")) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Phone number contains invalid characters.\nOnly digits, spaces, +, -, and parentheses are allowed.",
+                    "Invalid Phone Number",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
             if(firstName.isEmpty() || lastName.isEmpty()) {
                 showError("First Name and Last Name are both required.");
                 return;
@@ -585,6 +595,17 @@ public class BeachResortManagementGUI extends JFrame {
                 String phone = phoneField.getText().trim();
                 String email = emailField.getText().trim();
                 String passport = passportField.getText().trim();
+
+                // only allow numbers, -, +, () in phone field
+                if (!phone.matches("[0-9 +()-]*")) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Phone number contains invalid characters.\nOnly digits, spaces, +, -, and parentheses are allowed.",
+                        "Invalid Phone Number",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
 
                 if(firstName.isEmpty() || lastName.isEmpty()) {
                     showError("First Name and Last Name are required.");
@@ -1230,9 +1251,32 @@ public class BeachResortManagementGUI extends JFrame {
             int result = JOptionPane.showConfirmDialog(this, inputPanel, "Edit Amenity", JOptionPane.OK_CANCEL_OPTION);
 
             if (result == JOptionPane.OK_OPTION) {
-                amenity.setName(nameField.getText().trim());
-                amenity.setDescription(descArea.getText().trim());
-                amenity.setRate(Double.parseDouble(rateField.getText().trim()));
+                String name = nameField.getText().trim();
+                String desc = descArea.getText().trim();
+                String rateText = rateField.getText().trim();
+
+                // validate name or rate empty
+                if(name.isEmpty() || rateText.isEmpty()) {
+                    showError("Name and Rate are both required.");
+                    return;
+                }
+
+                // validate rate (positive valid number)
+                double rate;
+                try {
+                    rate = Double.parseDouble(rateText);
+                    if (rate < 0) {
+                        showError("Rate must be a positive number.");
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    showError("Rate must be a valid number.");
+                    return;
+                }
+
+                amenity.setName(name);
+                amenity.setDescription(desc);
+                amenity.setRate(rate);
                 amenity.setAvailability((String) availCombo.getSelectedItem());
 
                 amenityDAO.updateAmenity(amenity);
