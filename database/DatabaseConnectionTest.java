@@ -27,9 +27,9 @@ public class DatabaseConnectionTest {
 
         // Test 2: Try to connect to MySQL server
         System.out.println("Test 2: Connecting to MySQL server...");
-        String url = "jdbc:mysql://localhost:3306/beach_resort";
+        String url = "jdbc:mysql://localhost:3306/CCINFOM-S27-06-DBCREATION";
         String user = "root"; // CHANGE THIS to your MySQL username
-        String password = "ChB0770!"; // CHANGE THIS to your MySQL password
+        String password = "<User Password>"; // CHANGE THIS to your MySQL password
 
         System.out.println("  URL: " + url);
         System.out.println("  User: " + user);
@@ -77,10 +77,10 @@ public class DatabaseConnectionTest {
             System.err.println("  Error: " + e.getMessage());
             System.err.println("\nCommon Solutions:");
             System.err.println("  1. Make sure MySQL is running");
-            System.err.println("  2. Verify database 'beach_resort' exists");
-            System.err.println("     Run: CREATE DATABASE beach_resort;");
+            System.err.println("  2. Verify database 'CCINFOM-S27-06-DBCREATION' exists");
+            System.err.println("     Run: CREATE DATABASE CCINFOM-S27-06-DBCREATION;");
             System.err.println("  3. Check username/password in this file (lines 21-22)");
-            System.err.println("  4. Run the beach_resort.sql script to create tables");
+            System.err.println("  4. Run the CCINFOM-S27-06-DBCREATION.sql script to create tables");
             System.err.println("  5. Check MySQL is running on localhost:3306");
             e.printStackTrace();
         } finally {
