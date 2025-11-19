@@ -2488,9 +2488,12 @@ public class BeachResortManagementGUI extends JFrame {
 
         // Guest ID field with search
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.NONE;
         formPanel.add(new JLabel("Guest ID:"), gbc);
 
         gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         JTextField guestIdField = new JTextField(15);
         formPanel.add(guestIdField, gbc);
 
