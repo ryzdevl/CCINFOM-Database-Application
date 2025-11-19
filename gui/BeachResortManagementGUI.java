@@ -1140,35 +1140,62 @@ public class BeachResortManagementGUI extends JFrame {
     }
 
     private void addAmenity(DefaultTableModel model) {
-        if (amenityDAO == null) return;
+        if (amenityDAO == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Database connection not ready. Please check database setup.",
+                    "Connection Error",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         JTextField nameField = new JTextField(20);
-        JTextArea descArea = new JTextArea(3, 20);
+        JTextArea descAreaField = new JTextArea(3, 20);
         JTextField rateField = new JTextField(20);
 
         JPanel inputPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         inputPanel.add(new JLabel("Name:"));
         inputPanel.add(nameField);
         inputPanel.add(new JLabel("Description:"));
-        inputPanel.add(new JScrollPane(descArea));
+        inputPanel.add(new JScrollPane(descAreaField));
         inputPanel.add(new JLabel("Rate:"));
         inputPanel.add(rateField);
 
         int result = JOptionPane.showConfirmDialog(this, inputPanel, "Add Amenity", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
+            String name = nameField.getText().trim();
+            String descArea = descAreaField.getText().trim();
+            String rateText = rateField.getText().trim();
+
+            if(name.isEmpty() || rateText.isEmpty()) {
+                showError("Name and Rate are both required.");
+                return;
+            }
+
+            double rate;
+            try {
+                rate = Double.parseDouble(rateText);
+                if (rate < 0) {
+                    showError("Rate must be a positive number.");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                showError("Rate must be a valid number.");
+                return;
+            }
+
             try {
                 Amenity amenity = new Amenity(
-                        nameField.getText().trim(),
-                        descArea.getText().trim(),
-                        Double.parseDouble(rateField.getText().trim())
+                        name,
+                        descArea,
+                        rate
                 );
 
                 Long id = amenityDAO.addAmenity(amenity);
                 JOptionPane.showMessageDialog(this, "Amenity added with ID: " + id, "Success", JOptionPane.INFORMATION_MESSAGE);
                 loadAmenityData(model);
             } catch (SQLException e) {
-                showError("Error: " + e.getMessage());
+                showError("Error adding amenity: " + e.getMessage());
             }
         }
     }
@@ -1359,7 +1386,13 @@ public class BeachResortManagementGUI extends JFrame {
     }
 
     private void addInventoryItem(DefaultTableModel model) {
-        if (inventoryDAO == null) return;
+        if (inventoryDAO == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Database connection not ready. Please check database setup.",
+                    "Connection Error",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         JTextField nameField = new JTextField(20);
         JSpinner qtySpinner = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
@@ -1376,21 +1409,30 @@ public class BeachResortManagementGUI extends JFrame {
         int result = JOptionPane.showConfirmDialog(this, inputPanel, "Add Inventory Item", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
-            try {
-                InventoryItem item = new InventoryItem(
-                        nameField.getText().trim(),
-                        (Integer) qtySpinner.getValue(),
-                        supplierField.getText().trim()
-                );
+                String name = nameField.getText().trim();
+                int quantity = (int) qtySpinner.getValue();
+                String supplier = supplierField.getText().trim();
 
-                Long id = inventoryDAO.addInventoryItem(item);
-                JOptionPane.showMessageDialog(this, "Item added with ID: " + id, "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadInventoryData(model);
-            } catch (SQLException e) {
-                showError("Error: " + e.getMessage());
+                if (name.isEmpty() || supplier.isEmpty()) {
+                    showError("Name and Supplier are both required.");
+                    return;
+                }
+
+                try {
+                    InventoryItem item = new InventoryItem(
+                            name,
+                            quantity,
+                            supplier
+                    );
+
+                    Long id = inventoryDAO.addInventoryItem(item);
+                    JOptionPane.showMessageDialog(this, "Item added with ID: " + id, "Success", JOptionPane.INFORMATION_MESSAGE);
+                    loadInventoryData(model);
+                } catch (SQLException e) {
+                    showError("Error: " + e.getMessage());
+                }
             }
         }
-    }
 
     private void editInventoryItem(JTable table, DefaultTableModel model) {
         int row = table.getSelectedRow();
@@ -2804,29 +2846,29 @@ public class BeachResortManagementGUI extends JFrame {
 
             // checks that transaction ref only uses alphanumeric characters (Aa-Zz & 0-9)
             if (!transactionRef.matches("[a-zA-Z0-9]+")) {
-                JOptionPane.showMessageDialog(null, 
-                    "Transaction reference must only contain letters and numbers.",
-                    "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        "Transaction reference must only contain letters and numbers.",
+                        "Invalid Input", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             // checks that transaction ref is only up to 8 characters
             if (transactionRef.length() > 8) {
-                JOptionPane.showMessageDialog(null, 
-                    "Transaction reference must have a maximum of 8 characters.",
-                    "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        "Transaction reference must have a maximum of 8 characters.",
+                        "Invalid Input", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             try {
                 // checks that transaction ref is unique
                 if (!checkOutDAO.isTransactionRefUnique(transactionRef)) {
-                    JOptionPane.showMessageDialog(null, 
-                        "Transaction reference already exists.",
-                        "Duplicate Reference", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                            "Transaction reference already exists.",
+                            "Duplicate Reference", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
-                
+
                 double amountPaid = Double.parseDouble(amountPaidField.getText());
                 String method = paymentMethodBox.getSelectedItem().toString();
 
