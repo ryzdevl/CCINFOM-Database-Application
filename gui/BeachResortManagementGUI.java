@@ -525,6 +525,17 @@ public class BeachResortManagementGUI extends JFrame {
             String email = emailField.getText().trim();
             String passport = passportField.getText().trim();
 
+            // only allow numbers, -, +, () in phone field
+            if (!phone.matches("[0-9 +()-]*")) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Phone number contains invalid characters.\nOnly digits, spaces, +, -, and parentheses are allowed.",
+                    "Invalid Phone Number",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
             if(firstName.isEmpty() || lastName.isEmpty()) {
                 showError("First Name and Last Name are both required.");
                 return;
@@ -585,6 +596,17 @@ public class BeachResortManagementGUI extends JFrame {
                 String phone = phoneField.getText().trim();
                 String email = emailField.getText().trim();
                 String passport = passportField.getText().trim();
+
+                // only allow numbers, -, +, () in phone field
+                if (!phone.matches("[0-9 +()-]*")) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Phone number contains invalid characters.\nOnly digits, spaces, +, -, and parentheses are allowed.",
+                        "Invalid Phone Number",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
 
                 if(firstName.isEmpty() || lastName.isEmpty()) {
                     showError("First Name and Last Name are required.");
