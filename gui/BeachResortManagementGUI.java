@@ -508,7 +508,7 @@ public class BeachResortManagementGUI extends JFrame {
         inputPanel.add(firstNameField);
         inputPanel.add(new JLabel("Last Name:"));
         inputPanel.add(lastNameField);
-        inputPanel.add(new JLabel("Phone (Optiona):"));
+        inputPanel.add(new JLabel("Phone (Optional):"));
         inputPanel.add(phoneField);
         inputPanel.add(new JLabel("Email (Optional):"));
         inputPanel.add(emailField);
@@ -3773,5 +3773,6 @@ public class BeachResortManagementGUI extends JFrame {
             }
         });
     }
+
 
 }
