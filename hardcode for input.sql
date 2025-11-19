@@ -4,11 +4,11 @@
 -- ============================================================================
 
 -- Drop database if exists (for clean setup)
-DROP DATABASE IF EXISTS beach_resort;
+DROP DATABASE IF EXISTS `CCINFOM-S27-06-DBCREATION`;
 
 -- Create Database
-CREATE DATABASE beach_resort CHARACTER SET = 'utf8mb4' COLLATE = 'utf8mb4_unicode_ci';
-USE beach_resort;
+CREATE DATABASE `CCINFOM-S27-06-DBCREATION` CHARACTER SET = 'utf8mb4' COLLATE = 'utf8mb4_unicode_ci';
+USE `CCINFOM-S27-06-DBCREATION`;
 
 -- ============================================================================
 -- TABLE CREATION
@@ -324,7 +324,7 @@ SELECT 'Payments', COUNT(*) FROM payment;
 -- ============================================================================
 
 SELECT '✓ Database setup complete!' as Status,
-       'beach_resort' as Database_Name,
+       'CCINFOM-S27-06-DBCREATION' as Database_Name,
        '15 tables created' as Tables,
        'Sample data inserted' as Data_Status;
        
