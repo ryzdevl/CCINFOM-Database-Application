@@ -73,7 +73,7 @@ public class BeachResortManagementGUI extends JFrame {
                 JOptionPane.showMessageDialog(this,
                         "Could not connect to database.\nPlease check:\n" +
                                 "1. MySQL is running\n" +
-                                "2. Database 'beach_resort' exists\n" +
+                                "2. Database 'CCINFOM-S27-06-DBCREATION' exists\n" +
                                 "3. Credentials in DatabaseConnection.java are correct",
                         "Database Connection Error",
                         JOptionPane.WARNING_MESSAGE);
@@ -3821,3 +3821,4 @@ public class BeachResortManagementGUI extends JFrame {
 
 
 }
+
