@@ -3,9 +3,9 @@ package database;
 import java.sql.*;
 
 public class DatabaseConnection {
-    private static final String URL = "jdbc:mysql://localhost:3306/beach_resort";
+    private static final String URL = "jdbc:mysql://localhost:3306/CCINFOM-S27-06-DBCREATION";
     private static final String USER = "root"; // Change to your MySQL username
-    private static final String PASSWORD = "<User Password>"; // Change to your MySQL password (Important!)
+    private static final String PASSWORD = "1"; // Change to your MySQL password (Important!)
 
     public static Connection getConnection() throws SQLException {
         try {
