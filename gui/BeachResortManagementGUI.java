@@ -525,17 +525,6 @@ public class BeachResortManagementGUI extends JFrame {
             String email = emailField.getText().trim();
             String passport = passportField.getText().trim();
 
-            // only allow numbers, -, +, () in phone field
-            if (!phone.matches("[0-9 +()-]*")) {
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Phone number contains invalid characters.\nOnly digits, spaces, +, -, and parentheses are allowed.",
-                    "Invalid Phone Number",
-                    JOptionPane.WARNING_MESSAGE
-                );
-                return;
-            }
-
             if(firstName.isEmpty() || lastName.isEmpty()) {
                 showError("First Name and Last Name are both required.");
                 return;
@@ -596,17 +585,6 @@ public class BeachResortManagementGUI extends JFrame {
                 String phone = phoneField.getText().trim();
                 String email = emailField.getText().trim();
                 String passport = passportField.getText().trim();
-
-                // only allow numbers, -, +, () in phone field
-                if (!phone.matches("[0-9 +()-]*")) {
-                    JOptionPane.showMessageDialog(
-                        this,
-                        "Phone number contains invalid characters.\nOnly digits, spaces, +, -, and parentheses are allowed.",
-                        "Invalid Phone Number",
-                        JOptionPane.WARNING_MESSAGE
-                    );
-                    return;
-                }
 
                 if(firstName.isEmpty() || lastName.isEmpty()) {
                     showError("First Name and Last Name are required.");
@@ -1252,32 +1230,9 @@ public class BeachResortManagementGUI extends JFrame {
             int result = JOptionPane.showConfirmDialog(this, inputPanel, "Edit Amenity", JOptionPane.OK_CANCEL_OPTION);
 
             if (result == JOptionPane.OK_OPTION) {
-                String name = nameField.getText().trim();
-                String desc = descArea.getText().trim();
-                String rateText = rateField.getText().trim();
-
-                // validate name or rate empty
-                if(name.isEmpty() || rateText.isEmpty()) {
-                    showError("Name and Rate are both required.");
-                    return;
-                }
-
-                // validate rate (positive valid number)
-                double rate;
-                try {
-                    rate = Double.parseDouble(rateText);
-                    if (rate < 0) {
-                        showError("Rate must be a positive number.");
-                        return;
-                    }
-                } catch (NumberFormatException e) {
-                    showError("Rate must be a valid number.");
-                    return;
-                }
-
-                amenity.setName(name);
-                amenity.setDescription(desc);
-                amenity.setRate(rate);
+                amenity.setName(nameField.getText().trim());
+                amenity.setDescription(descArea.getText().trim());
+                amenity.setRate(Double.parseDouble(rateField.getText().trim()));
                 amenity.setAvailability((String) availCombo.getSelectedItem());
 
                 amenityDAO.updateAmenity(amenity);
@@ -3282,19 +3237,19 @@ public class BeachResortManagementGUI extends JFrame {
 
         // Rental Start DateTime
         gbc.gridx = 0; gbc.gridy = 8; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Rental Start (YYYY-MM-DD HH:MM):"), gbc);
+        formPanel.add(new JLabel("Rental Start: "), gbc);
 
         gbc.gridx = 1; gbc.gridwidth = 2;
-        JTextField rentStartField = new JTextField(LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-        formPanel.add(rentStartField, gbc);
+        DatePickerPanel rentStartPicker = new DatePickerPanel(LocalDate.now());
+        formPanel.add(rentStartPicker, gbc);
 
         // Rental End DateTime
         gbc.gridx = 0; gbc.gridy = 9; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Rental End (YYYY-MM-DD HH:MM):"), gbc);
+        formPanel.add(new JLabel("Rental End: "), gbc);
 
         gbc.gridx = 1; gbc.gridwidth = 2;
-        JTextField rentEndField = new JTextField(LocalDateTime.now().plusHours(4).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-        formPanel.add(rentEndField, gbc);
+        DatePickerPanel rentEndPicker   = new DatePickerPanel(LocalDate.now().plusDays(1));
+        formPanel.add(rentEndPicker, gbc);
 
         // Active rentals display area
         gbc.gridx = 0; gbc.gridy = 10; gbc.gridwidth = 3;
@@ -3429,7 +3384,7 @@ public class BeachResortManagementGUI extends JFrame {
         processRentalBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
         processRentalBtn.addActionListener(e -> processAmenityRental(
                 guestIdField, reservationCombo, amenityCombo, quantitySpinner,
-                rentStartField, rentEndField, activeRentalsArea
+                rentStartPicker, rentEndPicker, activeRentalsArea
         ));
 
         JButton refreshRentalsBtn = createActionButton("🔄 Refresh Active Rentals", SECONDARY_COLOR);
@@ -3454,8 +3409,8 @@ public class BeachResortManagementGUI extends JFrame {
             reservationCombo.removeAllItems();
             amenityCombo.removeAllItems();
             quantitySpinner.setValue(1);
-            rentStartField.setText(LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-            rentEndField.setText(LocalDateTime.now().plusHours(4).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            rentStartPicker.setDate(LocalDate.now());
+            rentEndPicker.setDate(LocalDate.now().plusDays(1));
             activeRentalsArea.setText("");
         });
 
@@ -3499,7 +3454,7 @@ public class BeachResortManagementGUI extends JFrame {
     // Main method to process amenity rental
     private void processAmenityRental(JTextField guestIdField, JComboBox<Reservation> reservationCombo,
                                       JComboBox<Amenity> amenityCombo, JSpinner quantitySpinner,
-                                      JTextField rentStartField, JTextField rentEndField,
+                                      DatePickerPanel rentStartPicker, DatePickerPanel rentEndPicker,
                                       JTextArea activeRentalsArea) {
         try {
             if (amenityRentalDAO == null) {
@@ -3533,20 +3488,21 @@ public class BeachResortManagementGUI extends JFrame {
             int quantity = (Integer) quantitySpinner.getValue();
 
             // Parse datetime with flexible format
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-            LocalDateTime rentStart = LocalDateTime.parse(rentStartField.getText().trim(), formatter);
-            LocalDateTime rentEnd = LocalDateTime.parse(rentEndField.getText().trim(), formatter);
+            LocalDate rentStartDate = rentStartPicker.getDate();
+            LocalDate rentEndDate = rentEndPicker.getDate();
+
+            LocalDateTime rentStart = rentStartDate.atStartOfDay();
+            LocalDateTime rentEnd = rentEndDate.atTime(23, 59);
 
             // Validate dates
             if (rentEnd.isBefore(rentStart) || rentEnd.isEqual(rentStart)) {
                 showError("Rental end time must be after start time!");
                 return;
             }
-
-            //truncate now to minutes (since the import time uses second/milisecond hence the error)
-            LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-            if (rentStart.isBefore(now)) {
-                showError("Rental start time cannot be in the past!");
+            //prevents start date to be the past
+            LocalDate today = LocalDate.now();
+            if(rentStartDate.isBefore(today)) {
+                showError("Rental start date cannot be in the past!");
                 return;
             }
 
@@ -3602,14 +3558,12 @@ public class BeachResortManagementGUI extends JFrame {
 
             // Reset form fields
             quantitySpinner.setValue(1);
-            rentStartField.setText(LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-            rentEndField.setText(LocalDateTime.now().plusHours(4).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            rentStartPicker.setDate(LocalDate.now());
+            rentEndPicker.setDate(LocalDate.now().plusDays(1));
 
         } catch (NumberFormatException e) {
             showError("Invalid Guest ID format. Please enter a valid number.");
-        } catch (java.time.format.DateTimeParseException e) {
-            showError("Invalid date/time format. Please use YYYY-MM-DD HH:MM format (e.g., 2025-11-17 14:30)");
-        } catch (SQLException e) {
+        }  catch (SQLException e) {
             showError("Error processing rental: " + e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
@@ -3866,4 +3820,3 @@ public class BeachResortManagementGUI extends JFrame {
 
 
 }
-
