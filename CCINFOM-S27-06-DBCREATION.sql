@@ -1,6 +1,6 @@
 -- Database
-CREATE DATABASE IF NOT EXISTS beach_resort CHARACTER SET = 'utf8mb4' COLLATE = 'utf8mb4_unicode_ci';
-USE beach_resort;
+CREATE DATABASE IF NOT EXISTS CCINFOM-S27-06-DBCREATION CHARACTER SET = 'utf8mb4' COLLATE = 'utf8mb4_unicode_ci';
+USE CCINFOM-S27-06-DBCREATION;
 
 -- Guests
 CREATE TABLE guest (
@@ -179,3 +179,6 @@ CREATE TABLE checkin_checkout_log (
 CREATE INDEX idx_reservation_guest ON reservation(guest_id);
 CREATE INDEX idx_reservation_dates ON reservation(check_in, check_out);
 CREATE INDEX idx_amenity_name ON amenity(name);
+
+select * from guest
+
