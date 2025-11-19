@@ -415,6 +415,7 @@ public class BeachResortManagementGUI extends JFrame {
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         table.getTableHeader().setBackground(PRIMARY_COLOR);
         table.getTableHeader().setForeground(Color.BLACK);
+        table.getTableHeader().setReorderingAllowed(false); // make table uneditable
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(new LineBorder(new Color(189, 195, 199), 1));
@@ -722,6 +723,7 @@ public class BeachResortManagementGUI extends JFrame {
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         table.getTableHeader().setBackground(PRIMARY_COLOR);
         table.getTableHeader().setForeground(Color.BLACK);
+        table.getTableHeader().setReorderingAllowed(false); // make table uneditable
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(new LineBorder(new Color(189, 195, 199), 1));
@@ -1080,6 +1082,7 @@ public class BeachResortManagementGUI extends JFrame {
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         table.getTableHeader().setBackground(PRIMARY_COLOR);
         table.getTableHeader().setForeground(Color.BLACK);
+        table.getTableHeader().setReorderingAllowed(false); // make table uneditable
 
         JScrollPane scrollPane = new JScrollPane(table);
         panel.add(scrollPane, BorderLayout.CENTER);
@@ -1299,6 +1302,7 @@ public class BeachResortManagementGUI extends JFrame {
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         table.getTableHeader().setBackground(PRIMARY_COLOR);
         table.getTableHeader().setForeground(Color.BLACK);
+        table.getTableHeader().setReorderingAllowed(false); // make table uneditable
 
         JScrollPane scrollPane = new JScrollPane(table);
         panel.add(scrollPane, BorderLayout.CENTER);
@@ -3063,6 +3067,7 @@ public class BeachResortManagementGUI extends JFrame {
             };
 
             table.setModel(model);
+            table.getTableHeader().setReorderingAllowed(false); // make table uneditable
         } catch (Exception e) {
             e.printStackTrace();
         }
