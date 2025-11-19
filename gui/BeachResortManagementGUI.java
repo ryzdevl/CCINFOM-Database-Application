@@ -1252,9 +1252,32 @@ public class BeachResortManagementGUI extends JFrame {
             int result = JOptionPane.showConfirmDialog(this, inputPanel, "Edit Amenity", JOptionPane.OK_CANCEL_OPTION);
 
             if (result == JOptionPane.OK_OPTION) {
-                amenity.setName(nameField.getText().trim());
-                amenity.setDescription(descArea.getText().trim());
-                amenity.setRate(Double.parseDouble(rateField.getText().trim()));
+                String name = nameField.getText().trim();
+                String desc = descArea.getText().trim();
+                String rateText = rateField.getText().trim();
+
+                // validate name or rate empty
+                if(name.isEmpty() || rateText.isEmpty()) {
+                    showError("Name and Rate are both required.");
+                    return;
+                }
+
+                // validate rate (positive valid number)
+                double rate;
+                try {
+                    rate = Double.parseDouble(rateText);
+                    if (rate < 0) {
+                        showError("Rate must be a positive number.");
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    showError("Rate must be a valid number.");
+                    return;
+                }
+
+                amenity.setName(name);
+                amenity.setDescription(desc);
+                amenity.setRate(rate);
                 amenity.setAvailability((String) availCombo.getSelectedItem());
 
                 amenityDAO.updateAmenity(amenity);
