@@ -213,9 +213,9 @@ INSERT INTO guest_preference (guest_id, pref_key, pref_value) VALUES
 
 -- Insert Rooms
 INSERT INTO room (room_code, room_type, bed_type, max_capacity, rate_per_night, status, description) VALUES
-('R101', 'Standard', 'Single', 1, 80.00, 'reserved', 'Cozy single room with garden view'),
-('R102', 'Deluxe', 'Queen', 2, 150.00, 'reserved', 'Spacious room with queen bed and balcony'),
-('R103', 'Suite', 'King', 4, 250.00, 'reserved', 'Luxury suite with ocean view and living area'),
+('R101', 'Standard', 'Single', 1, 80.00, 'available', 'Cozy single room with garden view'),
+('R102', 'Deluxe', 'Queen', 2, 150.00, 'occupied', 'Spacious room with queen bed and balcony'),
+('R103', 'Suite', 'King', 4, 250.00, 'available', 'Luxury suite with ocean view and living area'),
 ('R104', 'Standard', 'Twin', 2, 90.00, 'reserved', 'Twin bed room perfect for friends'),
 ('R105', 'Deluxe', 'King', 2, 180.00, 'available', 'Premium room with king bed'),
 ('COTT-01', 'Cottage', 'King', 4, 300.00, 'reserved', 'Private beach cottage with kitchenette'),
